@@ -104,9 +104,6 @@ func (g *Game) SucceedMsg() string {
 }
 
 func (g *Game) StateUI(info string) comp.Tpl {
-	if info == "" {
-		return g.SucceedUI()
-	}
 	infoClass := "text-xl font-bold text-info"
 	return g.App.Tpl().Tpl(info).ClassName(infoClass)
 }
@@ -119,9 +116,15 @@ func (g *Game) DescriptionUI(description string) comp.Tpl {
 	return g.App.Tpl().Tpl(description).ClassName("text-xl text-gray-500")
 }
 
-func (g *Game) Main(succeed bool, stete, description string, main any) any {
+func (g *Game) Main(succeed bool, state, description string, main any) any {
+	var top comp.Tpl
+	if succeed {
+		top = g.SucceedUI()
+	} else {
+		top = g.StateUI(state)
+	}
 	return g.App.Service().Body(
-		g.App.Flex().Items(g.StateUI(stete)),
+		g.App.Flex().Items(top),
 		g.App.Wrapper(),
 		g.App.Flex().Items(main),
 		g.App.Flex().Items(g.DescriptionUI(description)),
