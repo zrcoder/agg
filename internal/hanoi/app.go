@@ -6,12 +6,12 @@ import (
 	"github.com/zrcoder/amisgo"
 )
 
-var game *Game
+var Hanoi *Game
 
-func Run() {
+func Run(codeFn func(string) error) {
 	app := amisgo.New()
-	game = New(app)
-	app.Mount("/", game.UI())
+	Hanoi = New(app, codeFn)
+	app.Mount("/", Hanoi.UI())
 
 	fmt.Println("Server started at http://localhost:3000")
 	panic(app.Run(":3000"))

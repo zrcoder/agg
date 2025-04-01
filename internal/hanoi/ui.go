@@ -14,7 +14,16 @@ const (
 func (g *Game) UI() comp.Page {
 	return g.App.Page().
 		Title(g.App.Tpl().Tpl("Tower of Hanoi").ClassName("text-2xl font-bold")).
-		Body(g.Game.Service())
+		Body(
+			g.App.Form().ColumnCount(3).
+				Submit(func(s schema.Schema) error {
+					return g.codeFn(s.Get("code").(string))
+				}).
+				Body(
+					g.Game.Service(),
+					g.App.Editor().Name("code"),
+				),
+		)
 }
 
 func (g *Game) Main() any {

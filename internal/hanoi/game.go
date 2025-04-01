@@ -21,6 +21,7 @@ type Game struct {
 	colors    []string
 	pileForms []comp.Form
 	steps     int
+	codeFn    func(string) error
 }
 
 type Pile struct {
@@ -34,12 +35,13 @@ type Disk struct {
 	ID int
 }
 
-func New(app *amisgo.App) *Game {
+func New(app *amisgo.App, codeFn func(string) error) *Game {
 	g := &Game{
 		App: app,
 		colors: []string{
 			"red", "green", "blue", "yellow", "brown", "pink", // "purple", "orange",
 		},
+		codeFn: codeFn,
 	}
 	levels := []pkg.Level{
 		{Name: "Easy", Value: 2},
@@ -85,10 +87,6 @@ func (g *Game) Reset() {
 	g.PileB.ClearDisks()
 	g.PileC.ClearDisks()
 	g.ShiftDisk = nil
-}
-
-func (g *Game) RunCode(code string) {
-	// TODO
 }
 
 func (g *Game) IsDone() bool {
