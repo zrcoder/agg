@@ -20,7 +20,6 @@ type Game struct {
 	PrevForm   comp.Form
 	NextForm   comp.Form
 	ResetForm  comp.Form
-	LevelUI    comp.Flex
 	reset      func()
 	rd         *rand.Rand
 	sceneName  string
@@ -61,7 +60,10 @@ func (g *Game) makeLevelUI() {
 	g.PrevForm = g.levelForm(-1)
 	g.NextForm = g.levelForm(1)
 	g.ResetForm = g.levelForm(0)
-	g.LevelUI = g.App.Flex().Items(
+}
+
+func (g *Game) LevelUI() comp.Flex {
+	return g.App.Flex().Items(
 		g.PrevForm,
 		g.App.Tpl().Tpl(g.CurrentLevel().Name).ClassName("text-xl font-bold text-info pr-3"),
 		g.NextForm,
@@ -129,7 +131,7 @@ func (g *Game) Main(succeed bool, state, description string, main any) any {
 		g.App.Flex().Items(main),
 		g.App.Flex().Items(g.DescriptionUI(description)),
 		g.App.Divider(),
-		g.LevelUI,
+		g.LevelUI(),
 	)
 }
 

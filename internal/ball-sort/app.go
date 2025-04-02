@@ -17,8 +17,8 @@ func Run() {
 	app := amisgo.New(
 		conf.WithTitle(game.Title),
 		conf.WithThemes(
-			conf.Theme{Value: conf.ThemeCxd, Label: "○"},
-			conf.Theme{Value: conf.ThemeDark, Label: "☽"},
+			conf.Theme{Value: conf.ThemeCxd, Icon: "fa fa-sun"},
+			conf.Theme{Value: conf.ThemeDark, Icon: "fa fa-moon"},
 		),
 		conf.WithCustomCSS(customCSS),
 	)
