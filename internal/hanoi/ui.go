@@ -1,8 +1,6 @@
 package hanoi
 
 import (
-	"fmt"
-
 	"github.com/zrcoder/amisgo/comp"
 	"github.com/zrcoder/amisgo/schema"
 )
@@ -13,30 +11,42 @@ const (
 
 func (g *Game) UI() comp.Page {
 	return g.App.Page().
-		Title(g.App.Tpl().Tpl("Tower of Hanoi").ClassName("text-2xl font-bold")).
+		Title(g.Tpl().Tpl("Tower of Hanoi").ClassName("text-2xl font-bold")).
 		Body(
-			g.App.Form().ColumnCount(3).
+			g.Form().AutoFocus(true).ColumnCount(2).WrapWithPanel(false).
 				Submit(func(s schema.Schema) error {
 					return g.codeFn(s.Get("code").(string))
 				}).
 				Body(
-					g.Game.Service(),
-					g.App.Editor().Name("code"),
+					g.Flex().Items(g.topUI()),
+					g.Wrapper().ClassName("w-1/2").Body(g.Game.Service()),
+					g.Wrapper().ClassName("w-1/2").Body(g.App.Editor().Size("xxl").Language("go").Name("code")),
+					g.Flex().Justify("center").Items(g.levelUI(), g.Wrapper(), g.Button().Label("Go").Icon("fa fa-play").ActionType("submit").HotKey("ctrl+g")),
 				),
 		)
 }
 
+func (g *Game) topUI() comp.Tpl {
+	if g.IsDone() {
+		return g.SucceedUI()
+	}
+	return g.StateUI(g.State())
+}
+
 func (g *Game) Main() any {
-	return g.Game.Main(
-		g.IsDone(),
-		fmt.Sprintf("Steps: %d, minimum: %d", g.steps, g.MinSteps()),
-		"Press the pile key to select a pile.",
-		g.pilesUI(),
-	)
+	return g.pilesUI()
 }
 
 func (g *Game) pilesUI() comp.Flex {
-	return g.App.Flex().Items(g.PileA.UI(), g.PileB.UI(), g.PileC.UI())
+	return g.App.Flex().Items(g.PileA.UI(), g.Wrapper(), g.PileB.UI(), g.Wrapper(), g.PileC.UI())
+}
+
+func (g *Game) levelUI() comp.Flex {
+	return g.App.Flex().Items(
+		g.PrevForm,
+		g.App.Tpl().Tpl(g.CurrentLevel().Name).ClassName("text-xl font-bold text-info pr-3"),
+		g.NextForm,
+	)
 }
 
 func (p *Pile) UI() comp.Form {
@@ -51,17 +61,20 @@ func (p *Pile) UI() comp.Form {
 		top = p.Game.placeholderDiskUI()
 	}
 	n := len(p.Disks)
-	disks := make([]any, n)
-	for i := range disks {
-		disks[i] = p.App.Flex().Items(p.Disks[i].UI())
+	m := maxDiskCount - n
+	disks := make([]comp.Flex, maxDiskCount)
+	for i := 0; i < m; i++ {
+		disks[i] = p.App.Flex().Items(p.Game.placeholderDiskUI()).ClassName("h-10 py-0 my-0")
+	}
+	for i := 0; i < n; i++ {
+		disks[i+m] = p.App.Flex().Items(p.Disks[i].UI()).ClassName("h-10 py-0 my-0")
 	}
 	return p.Game.pileForms[p.Index].Body(
 		top,
 		p.App.Service().Body(disks),
 		p.App.Divider(),
-		p.App.Button().ActionType("submit").HotKey(string(rune('A'+p.Index))).Disabled(done),
-		p.App.Tpl().Tpl(string(rune('A'+p.Index))),
-	).ClassName("w-36 h-auto mx-2 py-0 border-b-2")
+		p.Flex().Items(p.App.Tpl().Tpl(string(rune('A'+p.Index)))),
+	).ClassName("w-36 h-auto")
 }
 
 func (g *Game) makePileForms() {
@@ -76,11 +89,11 @@ func (g *Game) makePileForms() {
 	}
 }
 
-func (d *Disk) UI() comp.Shape {
-	return d.Game.shape((float64(d.ID+1) * 20), "rectangle", d.Game.colors[d.ID])
-}
-
 const diskHeight = 40
+
+func (d *Disk) UI() comp.Shape {
+	return d.Game.shape((float64(d.ID+1) * diskHeight), "rectangle", d.Game.colors[d.ID])
+}
 
 func (g *Game) placeholderDiskUI() comp.Shape {
 	return g.shape(diskHeight, "rectangle", "transparent")
@@ -91,5 +104,5 @@ func (g *Game) starUI() comp.Shape {
 }
 
 func (g *Game) shape(width float64, shape, color string) comp.Shape {
-	return g.App.Shape().ShapeType(shape).Width(width).Height(diskHeight).Color(color)
+	return g.App.Shape().ShapeType(shape).Width(width).Height(diskHeight).Color(color).ClassName("py-0 my-0")
 }

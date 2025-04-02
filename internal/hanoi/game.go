@@ -1,13 +1,17 @@
 package hanoi
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/zrcoder/agg/pkg"
 	"github.com/zrcoder/amisgo"
 	"github.com/zrcoder/amisgo/comp"
 )
 
 const (
-	PileCount = 3
+	PileCount    = 3
+	maxDiskCount = 6
 )
 
 type Game struct {
@@ -93,20 +97,28 @@ func (g *Game) IsDone() bool {
 	return len(g.PileC.Disks) == g.CurrentLevel().Value
 }
 
-func (g *Game) SelectPile(pile *Pile) {
+func (g *Game) SelectPile(pile *Pile) error {
+	if g.IsDone() {
+		return errors.New("game is done")
+	}
 	if g.ShiftDisk != nil {
 		if g.ShiftDisk.Pile == pile || pile.Empty() || pile.Top().ID > g.ShiftDisk.ID {
 			pile.Push(g.ShiftDisk)
 			g.ShiftDisk = nil
-			return
+			return nil
 		}
-		return
+		return errors.New("invalid move")
 	}
 	g.ShiftDisk = pile.Pop()
+	return nil
 }
 
 func (g *Game) MinSteps() int {
 	return (1 << g.CurrentLevel().Value) - 1
+}
+
+func (g *Game) State() string {
+	return fmt.Sprintf("Steps: %d, minimum: %d", g.steps, g.MinSteps())
 }
 
 func (p *Pile) Push(d *Disk) {

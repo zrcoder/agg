@@ -26,6 +26,7 @@ func runCode(code string) error {
 	if code == "" {
 		return errors.New("code is empty")
 	}
+	hanoi.Hanoi.Reset()
 	code = preCodes + code
 	_, err := igop.RunFile(gopfileName, code, nil, 0)
 	fmt.Println(err)
