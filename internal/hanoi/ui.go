@@ -12,17 +12,25 @@ const (
 func (g *Game) UI() comp.Page {
 	return g.App.Page().
 		Title(g.Tpl().Tpl("Tower of Hanoi").ClassName("text-2xl font-bold")).
+		Toolbar(g.ThemeButtonGroupSelect()).
+		Body(g.Game.Service())
+}
+
+func (g *Game) Main() any {
+	return g.Form().AutoFocus(true).ColumnCount(2).WrapWithPanel(false).
+		Submit(func(s schema.Schema) error {
+			return g.codeFn(s.Get("code").(string))
+		}).
 		Body(
-			g.Form().AutoFocus(true).ColumnCount(2).WrapWithPanel(false).
-				Submit(func(s schema.Schema) error {
-					return g.codeFn(s.Get("code").(string))
-				}).
-				Body(
-					g.Flex().Items(g.topUI()),
-					g.Wrapper().ClassName("w-1/2").Body(g.Game.Service()),
-					g.Wrapper().ClassName("w-1/2").Body(g.App.Editor().Size("xxl").Language("go").Name("code")),
-					g.Flex().Justify("center").Items(g.levelUI(), g.Wrapper(), g.Button().Label("Go").Icon("fa fa-play").ActionType("submit").HotKey("ctrl+g")),
-				),
+			g.Flex().Items(g.topUI()),
+			g.Wrapper().ClassName("w-1/2").Body(g.pilesUI()),
+			g.Wrapper().ClassName("w-1/2").Body(g.App.Editor().Size("xxl").Language("go").Name("code")),
+			g.Wrapper(),
+			g.Flex().Justify("center").Items(
+				g.levelUI(),
+				g.Wrapper(),
+				g.Button().Label("Go").Icon("fa fa-play").ActionType("submit").HotKey("ctrl+g"),
+			),
 		)
 }
 
@@ -33,12 +41,11 @@ func (g *Game) topUI() comp.Tpl {
 	return g.StateUI(g.State())
 }
 
-func (g *Game) Main() any {
-	return g.pilesUI()
-}
-
-func (g *Game) pilesUI() comp.Flex {
-	return g.App.Flex().Items(g.PileA.UI(), g.Wrapper(), g.PileB.UI(), g.Wrapper(), g.PileC.UI())
+func (g *Game) pilesUI() comp.Wrapper {
+	return g.App.Wrapper().Body(
+		g.App.Flex().Items(g.PileC.UI()),
+		g.App.Flex().Items(g.PileA.UI(), g.Wrapper(), g.PileB.UI()),
+	)
 }
 
 func (g *Game) levelUI() comp.Flex {
@@ -49,60 +56,65 @@ func (g *Game) levelUI() comp.Flex {
 	)
 }
 
-func (p *Pile) UI() comp.Form {
-	done := p.Game.IsDone()
-	var top any
+func (p *Pile) UI() comp.TableView {
+	trs := make([]comp.Tr, 0, maxDiskCount+1)
+
+	var top comp.Tr
 	switch {
-	case done && p.Index == len(p.Game.piles)-1:
-		top = p.Game.starUI()
 	case p.Game.ShiftDisk != nil && p.Game.ShiftDisk.Pile == p:
 		top = p.Game.ShiftDisk.UI()
 	default:
-		top = p.Game.placeholderDiskUI()
+		top = p.Game.placeholderDiskUI(true)
 	}
-	n := len(p.Disks)
-	m := maxDiskCount - n
-	disks := make([]comp.Flex, maxDiskCount)
-	for i := 0; i < m; i++ {
-		disks[i] = p.App.Flex().Items(p.Game.placeholderDiskUI()).ClassName("h-10 py-0 my-0")
+	trs = append(trs, top)
+
+	for m := maxDiskCount - len(p.Disks); m > 0; m-- {
+		trs = append(trs, p.Game.placeholderDiskUI(false))
 	}
-	for i := 0; i < n; i++ {
-		disks[i+m] = p.App.Flex().Items(p.Disks[i].UI()).ClassName("h-10 py-0 my-0")
+	for _, disk := range p.Disks {
+		trs = append(trs, disk.UI())
 	}
-	return p.Game.pileForms[p.Index].Body(
-		top,
-		p.App.Service().Body(disks),
-		p.App.Divider(),
-		p.Flex().Items(p.App.Tpl().Tpl(string(rune('A'+p.Index)))),
-	).ClassName("w-36 h-auto")
+
+	return p.TableView().Trs(
+		p.Tr().Tds(p.Td().Style(p.tdBorderNone()).Align("center").Body(p.TableView().Trs(trs...))),
+		p.Tr().Tds(p.Td().Style(p.tdBorderTop()).Align("center").Body(p.App.Tpl().ClassName("text-xl font-bold").Tpl(string(rune('A'+p.Index))))),
+	)
 }
 
-func (g *Game) makePileForms() {
-	g.pileForms = make([]comp.Form, PileCount)
-	for i := 0; i < PileCount; i++ {
-		i := i
-		g.pileForms[i] = g.App.Form().Mode("inline").WrapWithPanel(false).Submit(
-			func(s schema.Schema) error {
-				g.SelectPile(g.piles[i])
-				return nil
-			})
+func (d *Disk) UI() comp.Tr {
+	tds := make([]comp.Td, 0, 2*maxDiskCount)
+	blanks := maxDiskCount - d.ID - 1
+	for i := 0; i < blanks; i++ {
+		tds = append(tds, d.Td().Style(d.tdBorderNone()))
 	}
+	for i := 0; i < 2*(d.ID+1); i++ {
+		tds = append(tds, d.Td().Background(d.colors[d.ID]).Style(d.tdBorderNone()))
+	}
+	for i := 0; i < blanks; i++ {
+		tds = append(tds, d.Td().Style(d.tdBorderNone()))
+	}
+	return d.Tr().Tds(tds...)
 }
 
-const diskHeight = 40
-
-func (d *Disk) UI() comp.Shape {
-	return d.Game.shape((float64(d.ID+1) * diskHeight), "rectangle", d.Game.colors[d.ID])
+func (g *Game) placeholderDiskUI(isTop bool) comp.Tr {
+	tds := make([]comp.Td, maxDiskCount*2)
+	for i := range tds {
+		tds[i] = g.Td().Style(schema.Schema{"borderWidth": 0})
+		if !isTop && i == len(tds)/2 {
+			tds[i].Style(g.tdBorderLeft())
+		}
+	}
+	return g.Tr().Tds(tds...)
 }
 
-func (g *Game) placeholderDiskUI() comp.Shape {
-	return g.shape(diskHeight, "rectangle", "transparent")
+func (g *Game) tdBorderLeft() schema.Schema {
+	return schema.Schema{"borderLeftWidth": 1, "borderRightWidth": 0, "borderTopWidth": 0, "borderBottomWidth": 0}
 }
 
-func (g *Game) starUI() comp.Shape {
-	return g.shape(diskHeight, "star", "orange")
+func (g *Game) tdBorderTop() schema.Schema {
+	return schema.Schema{"borderLeftWidth": 0, "borderRightWidth": 0, "borderTopWidth": 1, "borderBottomWidth": 0}
 }
 
-func (g *Game) shape(width float64, shape, color string) comp.Shape {
-	return g.App.Shape().ShapeType(shape).Width(width).Height(diskHeight).Color(color).ClassName("py-0 my-0")
+func (g *Game) tdBorderNone() schema.Schema {
+	return schema.Schema{"borderWidth": 0}
 }

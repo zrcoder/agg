@@ -43,8 +43,8 @@ github.com/visualfc/goembed v0.3.2/go.mod h1:jCVCz/yTJGyslo6Hta+pYxWWBuq9ADCcIVZ
 github.com/visualfc/xtype v0.2.0 h1:0ESNXyWHtK01kaOzOyqHsR1ZjEPdNu/IWPZkf0VOHl8=
 github.com/visualfc/xtype v0.2.0/go.mod h1:183MDtzLqyDkCm5zCH42vJGq/aQE5W25k3Z6UOZxLF0=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-github.com/zrcoder/amisgo v0.11.18-0.20250401032538-56273f9876da h1:QZyIy3pNkFWemogo/Uqk+Fq/OwIBtGYsdVF0Jb/8te8=
-github.com/zrcoder/amisgo v0.11.18-0.20250401032538-56273f9876da/go.mod h1:S9ywPkM6KkiQfeTIi7Y+6MYSBCXiO1PWi29Nu7KoUdY=
+github.com/zrcoder/amisgo v0.11.19 h1:k1EKc8qEvfIMQettq1TSN3Ki04oawuvDRuusizZClnc=
+github.com/zrcoder/amisgo v0.11.19/go.mod h1:S9ywPkM6KkiQfeTIi7Y+6MYSBCXiO1PWi29Nu7KoUdY=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
 golang.org/x/crypto v0.13.0/go.mod h1:y6Z2r+Rw4iayiXXAIxJIDAJ1zMW4yaTpebo8fPOliYc=

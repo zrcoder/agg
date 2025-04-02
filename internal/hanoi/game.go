@@ -6,7 +6,6 @@ import (
 
 	"github.com/zrcoder/agg/pkg"
 	"github.com/zrcoder/amisgo"
-	"github.com/zrcoder/amisgo/comp"
 )
 
 const (
@@ -23,7 +22,6 @@ type Game struct {
 	piles     []*Pile
 	ShiftDisk *Disk
 	colors    []string
-	pileForms []comp.Form
 	steps     int
 	codeFn    func(string) error
 }
@@ -63,7 +61,6 @@ func New(app *amisgo.App, codeFn func(string) error) *Game {
 	g.PileB = NewPile(g, 1)
 	g.PileC = NewPile(g, 2)
 	g.piles = []*Pile{g.PileA, g.PileB, g.PileC}
-	g.makePileForms()
 	g.Reset()
 	return g
 }

@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/goplus/igop v0.35.0
-	github.com/zrcoder/amisgo v0.11.18-0.20250401032538-56273f9876da
+	github.com/zrcoder/amisgo v0.11.19
 )
 
 require (
