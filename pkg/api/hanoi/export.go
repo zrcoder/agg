@@ -6,6 +6,8 @@ import (
 	"github.com/zrcoder/agg/internal/hanoi"
 )
 
+type Pile = func() *hanoi.Pile
+
 func A() *hanoi.Pile {
 	return hanoi.Hanoi.PileA
 }
@@ -18,7 +20,7 @@ func C() *hanoi.Pile {
 	return hanoi.Hanoi.PileC
 }
 
-func Tap(getPile func() *hanoi.Pile) {
+func Tap(getPile Pile) {
 	hanoi.Hanoi.SelectPile(getPile())
 	time.Sleep(200 * time.Millisecond)
 }

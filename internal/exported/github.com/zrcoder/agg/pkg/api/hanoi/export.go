@@ -20,8 +20,10 @@ func init() {
 		},
 		Interfaces: map[string]reflect.Type{},
 		NamedTypes: map[string]reflect.Type{},
-		AliasTypes: map[string]reflect.Type{},
-		Vars:       map[string]reflect.Value{},
+		AliasTypes: map[string]reflect.Type{
+			"Pile": reflect.TypeOf((*q.Pile)(nil)).Elem(),
+		},
+		Vars: map[string]reflect.Value{},
 		Funcs: map[string]reflect.Value{
 			"A":   reflect.ValueOf(q.A),
 			"B":   reflect.ValueOf(q.B),

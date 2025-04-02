@@ -24,7 +24,7 @@ func (g *Game) Main() any {
 		Body(
 			g.Flex().Items(g.topUI()),
 			g.Wrapper().ClassName("w-1/2").Body(g.pilesUI()),
-			g.Wrapper().ClassName("w-1/2").Body(g.App.Editor().Size("xxl").Language("go").Name("code")),
+			g.Wrapper().ClassName("w-1/2").Body(g.App.Editor().Size("xxl").Language("go").Name("code").Options(schema.Schema{"fontSize": 16})),
 			g.Wrapper(),
 			g.Flex().Justify("center").Items(
 				g.levelUI(),
