@@ -29,7 +29,7 @@ func (g *Game) Main() any {
 			g.Flex().Justify("center").Items(
 				g.levelUI(),
 				g.Wrapper(),
-				g.Button().Label("Go").Icon("fa fa-play").ActionType("submit").HotKey("ctrl+g"),
+				g.Button().Label("Go").Icon("fa fa-play").ActionType("submit").HotKey("ctrl+g").Reload(sceneName),
 			),
 		)
 }
@@ -43,7 +43,7 @@ func (g *Game) topUI() comp.Tpl {
 
 func (g *Game) pilesUI() comp.Wrapper {
 	return g.App.Wrapper().Body(
-		g.App.Flex().Items(g.PileC.UI()),
+		g.App.Flex().Items(g.App.Wrapper().ClassName("w-1/2").Body(g.PileC.UI())),
 		g.App.Flex().Items(g.PileA.UI(), g.Wrapper(), g.PileB.UI()),
 	)
 }
@@ -71,13 +71,13 @@ func (p *Pile) UI() comp.TableView {
 	for m := maxDiskCount - len(p.Disks); m > 0; m-- {
 		trs = append(trs, p.Game.placeholderDiskUI(false))
 	}
-	for _, disk := range p.Disks {
-		trs = append(trs, disk.UI())
+	for i := len(p.Disks) - 1; i >= 0; i-- {
+		trs = append(trs, p.Disks[i].UI())
 	}
 
 	return p.TableView().Trs(
-		p.Tr().Tds(p.Td().Style(p.tdBorderNone()).Align("center").Body(p.TableView().Trs(trs...))),
-		p.Tr().Tds(p.Td().Style(p.tdBorderTop()).Align("center").Body(p.App.Tpl().ClassName("text-xl font-bold").Tpl(string(rune('A'+p.Index))))),
+		p.Tr().Tds(p.Td().Style(p.tdBorderBottom()).Body(p.TableView().Trs(trs...))),
+		p.Tr().Tds(p.Td().Align("center").Style(p.tdBorderNone()).Body(p.App.Tpl().ClassName("text-xl font-bold").Tpl(string(rune('A'+p.Index))))),
 	)
 }
 
@@ -111,8 +111,8 @@ func (g *Game) tdBorderLeft() schema.Schema {
 	return schema.Schema{"borderLeftWidth": 1, "borderRightWidth": 0, "borderTopWidth": 0, "borderBottomWidth": 0}
 }
 
-func (g *Game) tdBorderTop() schema.Schema {
-	return schema.Schema{"borderLeftWidth": 0, "borderRightWidth": 0, "borderTopWidth": 1, "borderBottomWidth": 0}
+func (g *Game) tdBorderBottom() schema.Schema {
+	return schema.Schema{"borderLeftWidth": 0, "borderRightWidth": 0, "borderTopWidth": 0, "borderBottomWidth": 1}
 }
 
 func (g *Game) tdBorderNone() schema.Schema {

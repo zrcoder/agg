@@ -9,7 +9,7 @@ import (
 
 	"github.com/goplus/igop"
 	_ "github.com/goplus/igop/gopbuild"
-	_ "github.com/goplus/igop/pkg/sync"
+	_ "github.com/goplus/igop/gopbuild/pkg"
 )
 
 const (
@@ -19,6 +19,14 @@ const (
 	import (
 		. "github.com/zrcoder/agg/pkg/api/hanoi"
 	)
+
+	var (
+		a = A
+		b = B
+		c = C
+	)
+
+	type Pile = func()
 	`
 )
 

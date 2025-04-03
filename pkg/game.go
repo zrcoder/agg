@@ -129,6 +129,7 @@ func (g *Game) Main(succeed bool, state, description string, main any) any {
 		g.App.Flex().Items(top),
 		g.App.Wrapper(),
 		g.App.Flex().Items(main),
+		g.App.Wrapper(),
 		g.App.Flex().Items(g.DescriptionUI(description)),
 		g.App.Divider(),
 		g.LevelUI(),
