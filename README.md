@@ -8,5 +8,3 @@ Simple games for STEM education, based on [amisgo](https://github.com/zrcoder/am
 ## hanoi
 
 ![hanoi](hanoi.png)
-
-TODO: need update the view after each step.

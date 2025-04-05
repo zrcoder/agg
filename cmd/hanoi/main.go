@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"fmt"
+	"strings"
 
 	_ "github.com/zrcoder/agg/internal/exported/github.com/zrcoder/agg/pkg/api/hanoi"
 	"github.com/zrcoder/agg/internal/hanoi"
@@ -31,13 +31,12 @@ const (
 )
 
 func runCode(code string) error {
-	if code == "" {
+	if strings.TrimSpace(code) == "" {
 		return errors.New("code is empty")
 	}
 	hanoi.Hanoi.Reset()
 	code = preCodes + code
 	_, err := igop.RunFile(gopfileName, code, nil, 0)
-	fmt.Println(err)
 	return err
 }
 

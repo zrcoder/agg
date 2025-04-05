@@ -1,3 +1,5 @@
+gitee.com/rdor/amis-sdk/v6 v6.12.0 h1:i3hYcqxbnZT/eDB5hoVd/mnWeYmgsiJRy5IEV8jrWAI=
+gitee.com/rdor/amis-sdk/v6 v6.12.0/go.mod h1:2qzZTlGPFKPgVyh1qnxbNj8XWT11LYpPdJaBNAVWWTw=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -16,6 +18,8 @@ github.com/goplus/mod v0.13.17 h1:aWp14xosENrh7t0/0qcIejDmQEiTgI3ou2+KoLDlSlE=
 github.com/goplus/mod v0.13.17/go.mod h1:XlHf8mnQ4QkRDX14Of2tpywuHDd+JVpPStvh3egog+0=
 github.com/goplus/reflectx v1.3.2 h1:M6JBeENB8CB0F3FnlCpLtIqhAkluuVbCYHFzSrCLF9w=
 github.com/goplus/reflectx v1.3.2/go.mod h1:wHOS9ilbB4zrecI0W1dMmkW9JMcpXV7VjALVbNU9xfM=
+github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
+github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/mattn/go-runewidth v0.0.3/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
 github.com/modern-go/reflect2 v1.0.2/go.mod h1:yWuevngMOJpCy52FWWMvUC8ws7m/LJsjYzDa0/r8luk=
 github.com/peterh/liner v1.2.2/go.mod h1:xFwJyiKIXJZUKItq5dGHZSTBRAuG/CpeNpWLyiNRNwI=
@@ -43,8 +47,8 @@ github.com/visualfc/goembed v0.3.2/go.mod h1:jCVCz/yTJGyslo6Hta+pYxWWBuq9ADCcIVZ
 github.com/visualfc/xtype v0.2.0 h1:0ESNXyWHtK01kaOzOyqHsR1ZjEPdNu/IWPZkf0VOHl8=
 github.com/visualfc/xtype v0.2.0/go.mod h1:183MDtzLqyDkCm5zCH42vJGq/aQE5W25k3Z6UOZxLF0=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-github.com/zrcoder/amisgo v0.11.19 h1:k1EKc8qEvfIMQettq1TSN3Ki04oawuvDRuusizZClnc=
-github.com/zrcoder/amisgo v0.11.19/go.mod h1:S9ywPkM6KkiQfeTIi7Y+6MYSBCXiO1PWi29Nu7KoUdY=
+github.com/zrcoder/amisgo v0.11.21 h1:fNy46llkJyF1d9uVvUEuTJV+q2AzI/BFwjQLaQLRc50=
+github.com/zrcoder/amisgo v0.11.21/go.mod h1:S9ywPkM6KkiQfeTIi7Y+6MYSBCXiO1PWi29Nu7KoUdY=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
 golang.org/x/crypto v0.13.0/go.mod h1:y6Z2r+Rw4iayiXXAIxJIDAJ1zMW4yaTpebo8fPOliYc=

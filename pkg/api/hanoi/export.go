@@ -1,6 +1,8 @@
 package hanoi
 
 import (
+	"time"
+
 	"github.com/zrcoder/agg/internal/hanoi"
 )
 
@@ -18,4 +20,5 @@ func C() {
 
 func tap(p *hanoi.Pile) {
 	hanoi.Hanoi.SelectPile(p)
+	time.Sleep(500 * time.Millisecond)
 }

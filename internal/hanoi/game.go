@@ -9,8 +9,7 @@ import (
 )
 
 const (
-	PileCount    = 3
-	maxDiskCount = 6
+	PileCount = 3
 )
 
 type Game struct {
@@ -44,12 +43,6 @@ func New(app *amisgo.App, codeFn func(string) error) *Game {
 			"red", "green", "blue", "yellow", "brown", "pink", // "purple", "orange",
 		},
 		codeFn: codeFn,
-	}
-	levels := []pkg.Level{
-		{Name: "Easy", Value: 2},
-		{Name: "Medium", Value: 3},
-		{Name: "Hard", Value: 5},
-		{Name: "Expert", Value: 6},
 	}
 	base := pkg.New(
 		app,
@@ -88,26 +81,36 @@ func (g *Game) Reset() {
 	g.PileB.ClearDisks()
 	g.PileC.ClearDisks()
 	g.ShiftDisk = nil
+	g.steps = 0
 }
 
 func (g *Game) IsDone() bool {
 	return len(g.PileC.Disks) == g.CurrentLevel().Value
 }
 
-func (g *Game) SelectPile(pile *Pile) error {
+func (g *Game) SelectPile(pile *Pile) (err error) {
+	defer func() {
+		if err == nil {
+			err = updateUI(g.Main())
+		}
+	}()
+
 	if g.IsDone() {
-		return errors.New("game is done")
+		err = errors.New("game is done")
+		return
 	}
 	if g.ShiftDisk != nil {
 		if g.ShiftDisk.Pile == pile || pile.Empty() || pile.Top().ID > g.ShiftDisk.ID {
 			pile.Push(g.ShiftDisk)
 			g.ShiftDisk = nil
-			return nil
+			g.steps++
+			return
 		}
-		return errors.New("invalid move")
+		err = errors.New("invalid move")
+		return
 	}
 	g.ShiftDisk = pile.Pop()
-	return nil
+	return
 }
 
 func (g *Game) MinSteps() int {
@@ -115,7 +118,7 @@ func (g *Game) MinSteps() int {
 }
 
 func (g *Game) State() string {
-	return fmt.Sprintf("Steps: %d, minimum: %d", g.steps, g.MinSteps())
+	return fmt.Sprintf("Steps: %d, Minimum: %d", g.steps, g.MinSteps())
 }
 
 func (p *Pile) Push(d *Disk) {
@@ -137,7 +140,6 @@ func (p *Pile) Pop() *Disk {
 	}
 	disk := p.Disks[len(p.Disks)-1]
 	p.Disks = p.Disks[:len(p.Disks)-1]
-	disk.Pile = nil
 	return disk
 }
 

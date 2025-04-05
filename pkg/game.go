@@ -34,7 +34,7 @@ func New(app *amisgo.App, opts ...Option) *Game {
 	for _, opt := range opts {
 		opt(g)
 	}
-	g.makeLevelUI()
+	g.makeLevelForms()
 	return g
 }
 
@@ -56,7 +56,7 @@ func (g *Game) CurrentLevel() Level {
 	return g.levels[g.levelIndex]
 }
 
-func (g *Game) makeLevelUI() {
+func (g *Game) makeLevelForms() {
 	g.PrevForm = g.levelForm(-1)
 	g.NextForm = g.levelForm(1)
 	g.ResetForm = g.levelForm(0)
@@ -96,8 +96,12 @@ func (g *Game) levelForm(delta int) comp.Form {
 			return nil
 		}).
 		Body(
-			g.Button().Label(label).Icon(icon).HotKey(hotkey).
-				ActionType("submit").Reload(g.sceneName),
+			g.Button().ActionType("submit").Label(label).Icon(icon).HotKey(hotkey).
+				OnEvent(g.Event().Click(
+					g.EventActions(
+						g.EventAction().ActionType("refresh"),
+					),
+				)),
 		)
 }
 
@@ -137,5 +141,5 @@ func (g *Game) Main(succeed bool, state, description string, main any) any {
 }
 
 func (g *Game) Service() comp.Service {
-	return g.App.Service().Name(g.sceneName).GetSchema(g.sceneFn).Messages(schema.Schema{}).SilentPolling(true)
+	return g.App.Service().Name(g.sceneName).GetSchema(g.sceneFn).Messages(schema.Schema{}).SilentPolling(false)
 }
