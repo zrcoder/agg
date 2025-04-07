@@ -1,4 +1,4 @@
-package game
+package ballsort
 
 import (
 	"github.com/zrcoder/agg/pkg"

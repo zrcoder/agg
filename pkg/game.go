@@ -96,12 +96,7 @@ func (g *Game) levelForm(delta int) comp.Form {
 			return nil
 		}).
 		Body(
-			g.Button().ActionType("submit").Label(label).Icon(icon).HotKey(hotkey).
-				OnEvent(g.Event().Click(
-					g.EventActions(
-						g.EventAction().ActionType("refresh"),
-					),
-				)),
+			g.Button().ActionType("submit").Label(label).Icon(icon).HotKey(hotkey).Reload(g.sceneName),
 		)
 }
 

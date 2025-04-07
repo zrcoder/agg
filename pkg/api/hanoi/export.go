@@ -3,22 +3,23 @@ package hanoi
 import (
 	"time"
 
+	"github.com/zrcoder/agg/internal"
 	"github.com/zrcoder/agg/internal/hanoi"
 )
 
 func A() {
-	tap(hanoi.Hanoi.PileA)
+	tap(internal.Agg.Hanoi.PileA)
 }
 
 func B() {
-	tap(hanoi.Hanoi.PileB)
+	tap(internal.Agg.Hanoi.PileB)
 }
 
 func C() {
-	tap(hanoi.Hanoi.PileC)
+	tap(internal.Agg.Hanoi.PileC)
 }
 
 func tap(p *hanoi.Pile) {
-	hanoi.Hanoi.SelectPile(p)
+	internal.Agg.Hanoi.SelectPile(p)
 	time.Sleep(500 * time.Millisecond)
 }

@@ -3,34 +3,26 @@ package hanoi
 import (
 	"log"
 	"net/http"
-
-	"github.com/gorilla/websocket"
 )
 
 const (
 	wsPath = "/hanoi/ws"
 )
 
-var (
-	upgrader = websocket.Upgrader{}
-	wsConn   *websocket.Conn
-)
-
-func wsHandler(w http.ResponseWriter, r *http.Request) {
+func (g *Game) wsHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	wsConn, err = upgrader.Upgrade(w, r, nil)
+	g.wsConn, err = g.wsUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		log.Panic(err)
 		return
 	}
-	defer wsConn.Close()
+	defer g.wsConn.Close()
+
+	g.updateUI()
 
 	select {}
 }
 
-func updateUI(ui any) error {
-	data := map[string]any{
-		"main": ui,
-	}
-	return wsConn.WriteJSON(data)
+func (g *Game) updateUI() error {
+	return g.wsConn.WriteJSON(map[string]any{sceneName: g.Main()})
 }

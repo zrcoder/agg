@@ -1,4 +1,4 @@
-package game
+package ballsort
 
 import (
 	"fmt"
@@ -13,11 +13,8 @@ const (
 	Title     = "Ball Sort Puzzle"
 )
 
-func (g *Game) Index() comp.Page {
-	return g.App.Page().
-		Title(g.App.Tpl().Tpl(Title).ClassName("text-2xl font-bold")).
-		Toolbar(g.App.ThemeButtonGroupSelect()).
-		Body(g.Game.Service())
+func (g *Game) UI() comp.Service {
+	return g.Game.Service()
 }
 
 func (g *Game) Main() any {

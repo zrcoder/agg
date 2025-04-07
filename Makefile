@@ -5,8 +5,5 @@ clean:
 	@rm -rf internal/exported
 
 
-runHanoi:
-	@go run -ldflags="-checklinkname=0" ./cmd/hanoi
-
-runBallSort:
-	@go run ./cmd/ball-sort
+run:
+	@go run -ldflags="-checklinkname=0" ./cmd

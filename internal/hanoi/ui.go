@@ -11,17 +11,10 @@ const (
 	sceneName = "hanoi"
 )
 
-func (g *Game) UI() comp.Page {
-	return g.App.Page().
-		Title(g.Tpl().Tpl("Tower of Hanoi").ClassName("text-2xl font-bold")).
-		Toolbar(g.ThemeButtonGroupSelect()).
-		Body(
-			g.App.Service().Name(sceneName).InitFetch(true).
-				GetData(func() (any, error) {
-					return map[string]any{"main": g.Main()}, nil
-				}).
-				Ws(wsPath).Body(g.Amis().Name("main")),
-		)
+func (g *Game) UI() comp.Service {
+	return g.App.Service().Name(sceneName).Ws(wsPath).Body(
+		g.Amis().Name(sceneName),
+	)
 }
 
 func (g *Game) Main() any {
@@ -32,29 +25,34 @@ func (g *Game) Main() any {
 				if code == nil {
 					return errors.New("code is required")
 				}
-				go g.codeFn(code.(string))
+				go g.CodeAction(code.(string), g.PreCodeRunning)
 				return nil
 			},
-		).Body(
-		g.Flex().Items(g.stateUI()),
-		g.Wrapper().ClassName("w-1/2").Body(g.pilesUI()),
-		g.Wrapper().ClassName("w-1/2").Body(
-			g.App.Editor().Size("xxl").Language("go").Name("code").
-				Options(schema.Schema{
-					"fontSize":         16,
-					"wordWrap":         "on",
-					"quickSuggestions": false,
-				}).Value(g.CurrentLevel().Code),
-		),
-		g.Flex().ClassName("pt-4").Items(
-			g.Button().Label("Go").Icon("fa fa-play").Primary(true).ActionType("submit").HotKey("ctrl+g"),
-			g.Wrapper(),
-			g.ResetForm,
-			g.PrevForm,
-			g.App.Tpl().Tpl(g.CurrentLevel().Name).ClassName("text-xl font-bold text-info pr-3"),
-			g.NextForm,
-		),
-	)
+		).
+		Body(
+			g.Flex().Items(g.stateUI()),
+			g.Wrapper().ClassName("w-1/2").Body(g.pilesUI()),
+			g.Wrapper().ClassName("w-1/2").Body(
+				g.App.Editor().Size("xxl").Language("go").Name("code").Options(g.editorOptions()),
+			),
+			g.Flex().ClassName("pt-4").Items(
+				g.Button().Label("Go").Icon("fa fa-play").Primary(true).ActionType("submit").HotKey("ctrl+g"),
+				g.Wrapper(),
+				g.ResetForm,
+				g.PrevForm,
+				g.App.Tpl().Tpl(g.CurrentLevel().Name).ClassName("text-xl font-bold text-info pr-3"),
+				g.NextForm,
+				g.Wrapper(),
+				g.Button().Icon("fa fa-question").Label("Help").ActionType("drawer").Drawer(
+					g.Drawer().Size("lg").
+						Title(g.Tpl().Tpl(g.CurrentLevel().Help.Title).ClassName("text-xl font-bold")).Actions().CloseOnOutside(true).
+						Body(
+							g.Markdown().Value(g.CurrentLevel().Help.Info),
+							g.Editor().AllowFullscreen(false).Language("go").Disabled(true).Value(g.CurrentLevel().Help.Code).Size("xxl").Options(g.editorOptions()),
+						),
+				),
+			),
+		)
 }
 
 func (g *Game) stateUI() comp.Tpl {
@@ -151,4 +149,12 @@ func (g *Game) tdBorderBottom() schema.Schema {
 
 func (g *Game) tdBorderNone() schema.Schema {
 	return schema.Schema{"borderWidth": 0}
+}
+
+func (g *Game) editorOptions() schema.Schema {
+	return schema.Schema{
+		"fontSize":         16,
+		"wordWrap":         "on",
+		"quickSuggestions": false,
+	}
 }

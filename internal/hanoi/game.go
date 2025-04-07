@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/gorilla/websocket"
 	"github.com/zrcoder/agg/pkg"
 	"github.com/zrcoder/amisgo"
 )
@@ -15,14 +16,16 @@ const (
 type Game struct {
 	*amisgo.App
 	*pkg.Game
-	PileA     *Pile
-	PileB     *Pile
-	PileC     *Pile
-	piles     []*Pile
-	ShiftDisk *Disk
-	colors    []string
-	steps     int
-	codeFn    func(string) error
+	PileA      *Pile
+	PileB      *Pile
+	PileC      *Pile
+	piles      []*Pile
+	ShiftDisk  *Disk
+	colors     []string
+	steps      int
+	CodeAction func(string, func() error) error
+	wsConn     *websocket.Conn
+	wsUpgrader websocket.Upgrader
 }
 
 type Pile struct {
@@ -36,24 +39,29 @@ type Disk struct {
 	ID int
 }
 
-func New(app *amisgo.App, codeFn func(string) error) *Game {
+func New(app *amisgo.App, codeAction func(string, func() error) error) *Game {
 	g := &Game{
 		App: app,
 		colors: []string{
 			"red", "green", "blue", "yellow", "brown", "pink", // "purple", "orange",
 		},
-		codeFn: codeFn,
+		CodeAction: codeAction,
 	}
 	base := pkg.New(
 		app,
-		pkg.WithLevels(levels, g.Reset),
+		pkg.WithLevels(levels, g.LevelChanged),
 		pkg.WithScene(sceneName, g.Main),
 	)
+	g.wsUpgrader = websocket.Upgrader{}
+	g.App.HandleFunc(wsPath, g.wsHandler)
 	g.Game = base
 	g.PileA = NewPile(g, 0)
 	g.PileB = NewPile(g, 1)
 	g.PileC = NewPile(g, 2)
 	g.piles = []*Pile{g.PileA, g.PileB, g.PileC}
+	g.Shuffle(len(g.colors), func(i, j int) {
+		g.colors[i], g.colors[j] = g.colors[j], g.colors[i]
+	})
 	g.Reset()
 	return g
 }
@@ -73,10 +81,17 @@ func NewDisk(p *Pile, id int) *Disk {
 	}
 }
 
+func (g *Game) PreCodeRunning() error {
+	g.Reset()
+	return nil
+}
+
+func (g *Game) LevelChanged() {
+	g.Reset()
+	g.updateUI()
+}
+
 func (g *Game) Reset() {
-	g.Shuffle(len(g.colors), func(i, j int) {
-		g.colors[i], g.colors[j] = g.colors[j], g.colors[i]
-	})
 	g.PileA.renewDisks()
 	g.PileB.ClearDisks()
 	g.PileC.ClearDisks()
@@ -91,7 +106,7 @@ func (g *Game) IsDone() bool {
 func (g *Game) SelectPile(pile *Pile) (err error) {
 	defer func() {
 		if err == nil {
-			err = updateUI(g.Main())
+			err = g.updateUI()
 		}
 	}()
 

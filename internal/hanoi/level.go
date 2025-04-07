@@ -5,16 +5,14 @@ import "github.com/zrcoder/agg/pkg"
 const (
 	maxDiskCount = 6
 
-	easyLevelCode = `/*
-Welcome to the Tower of Hanoi!
+	easyLevelInfo = `Welcome to the Tower of Hanoi!
 
 Goal: Move all disks from pile A to pile C, following these rules:
 1. Move only one disk at a time
 2. Take the top disk from a pile and place it on another pile or an empty pile
 3. Never place a larger disk on top of a smaller disk
-*/
-
-// Tip: Type the letter (A, B, or C) to 'select' a pile
+`
+	easyLevelCode = `// Tip: Type the letter (A, B, or C) to 'select' a pile
 
 // Finish the solution:
 // Move the small disk from A to B
@@ -27,18 +25,21 @@ C
 
 `
 
-	mediumLevelCode = `// There are more disks now, try your best.
-// You can also type 'a', 'b', or 'c' instead of 'A', 'B', or 'C'.
-
+	mediumLevelInfo = `There are more disks now, try your best.
+`
+	mediumLevelCode = `// You can also type 'a', 'b', or 'c' instead of 'A', 'B', or 'C'.
 `
 
-	hardLevelCode = `// Solving the Tower of Hanoi with Recursion
-// Challenge: Implement the core logic of moving the largest disk
-// Key insights:
-// 1. Recursion breaks down complex problem into simpler sub-problems
-// 2. Each recursive call reduces the problem size by 1 disk
+	hardLevelInfo = `Solving the Tower of Hanoi with Recursion
+Challenge: 
 
-func solve(disks int, a, b, c Pile) {
+Implement the core logic of moving the largest disk
+Key insights:
+1. Recursion breaks down complex problem into simpler sub-problems
+2. Each recursive call reduces the problem size by 1 disk
+`
+
+	hardLevelCode = `func solve(disks int, a, b, c Pile) {
     // Base case: No disks to move
     if disks == 0 {
         return
@@ -61,11 +62,17 @@ func solve(disks int, a, b, c Pile) {
 // Demonstrate solving Tower of Hanoi with 5 disks
 solve 5, a, b, c
 `
+
+	expertLevelInfo = "Solve it with recursion"
+	expertLevelCode = `func solve(disks int, a, b, c Pile) {
+
+}
+`
 )
 
 var levels = []pkg.Level{
-	{Name: "Easy", Value: 2, Code: easyLevelCode},
-	{Name: "Medium", Value: 3, Code: mediumLevelCode},
-	{Name: "Hard", Value: 5, Code: hardLevelCode},
-	{Name: "Expert", Value: 6},
+	{Name: "Easy", Value: 2, Help: pkg.Help{Title: "Level: Easy", Info: easyLevelInfo, Code: easyLevelCode}},
+	{Name: "Medium", Value: 3, Help: pkg.Help{Title: "Level: Medium", Info: mediumLevelInfo, Code: mediumLevelCode}},
+	{Name: "Hard", Value: 5, Help: pkg.Help{Title: "Level: Hard", Info: hardLevelInfo, Code: hardLevelCode}},
+	{Name: "Expert", Value: 6, Help: pkg.Help{Title: "Level: Expert", Info: expertLevelInfo, Code: expertLevelCode}},
 }

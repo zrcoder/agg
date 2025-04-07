@@ -15,6 +15,7 @@ func init() {
 		Name: "hanoi",
 		Path: "github.com/zrcoder/agg/pkg/api/hanoi",
 		Deps: map[string]string{
+			"github.com/zrcoder/agg/internal":       "internal",
 			"github.com/zrcoder/agg/internal/hanoi": "hanoi",
 			"time":                                  "time",
 		},
