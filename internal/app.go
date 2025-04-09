@@ -5,15 +5,17 @@ import (
 	"fmt"
 	"net/http"
 
-	sdk "gitee.com/rdor/amis-sdk/v6"
 	ballsort "github.com/zrcoder/agg/internal/ball-sort"
 	"github.com/zrcoder/agg/internal/hanoi"
+	"github.com/zrcoder/agg/internal/static"
+
+	sdk "gitee.com/rdor/amis-sdk/v6"
 	"github.com/zrcoder/amisgo"
 	"github.com/zrcoder/amisgo/comp"
 	"github.com/zrcoder/amisgo/conf"
 )
 
-//go:embed bottole-button.css
+//go:embed static/bottole-button.css
 var customCSS string
 
 const Title = "Amisgo Games"
@@ -36,6 +38,7 @@ func Run(hanoiCodeAction func(string, func() error) error) {
 		),
 		conf.WithLocalSdk(http.FS(sdk.FS)),
 		conf.WithCustomCSS(customCSS),
+		conf.WithIcon("/static/agg.svg"),
 	)
 	Agg = &App{
 		App:      app,
@@ -43,6 +46,7 @@ func Run(hanoiCodeAction func(string, func() error) error) {
 		BallSort: ballsort.New(app),
 	}
 
+	app.StaticFS("/static", http.FS(static.FS))
 	app.Mount("/", index())
 
 	fmt.Println("Amisgo Games started at http://localhost:3000")
@@ -56,8 +60,8 @@ func index() comp.Page {
 		Toolbar(app.ThemeButtonGroupSelect()).
 		Body(
 			app.Tabs().TabsMode("vertical").ClassName("border-none").Tabs(
-				app.Tab().Title("Ball Sort Puzzle").Tab(Agg.BallSort.UI()),
-				app.Tab().Title("Tower of Hanoi").Tab(Agg.Hanoi.UI()),
+				app.Tab().Title("Ball Sort Puzzle").Hash("ball-sort").Tab(Agg.BallSort.UI()),
+				app.Tab().Title("Tower of Hanoi").Hash("hanoi").Tab(Agg.Hanoi.UI()),
 			),
 		)
 }
