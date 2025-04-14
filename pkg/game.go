@@ -4,9 +4,9 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/zrcoder/amisgo"
 	"github.com/zrcoder/amisgo/comp"
-	"github.com/zrcoder/amisgo/schema"
 )
 
 var succeedMsgs = []string{
@@ -23,7 +23,10 @@ type Game struct {
 	reset      func()
 	rd         *rand.Rand
 	sceneName  string
+	wsPath     string
 	sceneFn    func() any
+	wsConn     *websocket.Conn
+	wsUpgrader websocket.Upgrader
 }
 
 func New(app *amisgo.App, opts ...Option) *Game {
@@ -35,16 +38,24 @@ func New(app *amisgo.App, opts ...Option) *Game {
 		opt(g)
 	}
 	g.makeLevelForms()
+	g.wsUpgrader = websocket.Upgrader{}
+	g.App.HandleFunc(g.wsPath, g.wsHandler)
 	return g
 }
 
 func (g *Game) PrevLevel() {
-	g.levelIndex = (g.levelIndex - 1 + len(g.levels)) % len(g.levels)
+	if g.levelIndex == 0 {
+		return
+	}
+	g.levelIndex--
 	g.Reset()
 }
 
 func (g *Game) NextLevel() {
-	g.levelIndex = (g.levelIndex + 1) % len(g.levels)
+	if g.levelIndex == len(g.levels)-1 {
+		return
+	}
+	g.levelIndex++
 	g.Reset()
 }
 
@@ -56,85 +67,6 @@ func (g *Game) CurrentLevel() Level {
 	return g.levels[g.levelIndex]
 }
 
-func (g *Game) makeLevelForms() {
-	g.PrevForm = g.levelForm(-1)
-	g.NextForm = g.levelForm(1)
-	g.ResetForm = g.levelForm(0)
-}
-
-func (g *Game) LevelUI() comp.Flex {
-	return g.App.Flex().Items(
-		g.PrevForm,
-		g.App.Tpl().Tpl(g.CurrentLevel().Name).ClassName("text-xl font-bold text-info pr-3"),
-		g.NextForm,
-		g.App.Wrapper(),
-		g.ResetForm,
-	)
-}
-
-func (g *Game) levelForm(delta int) comp.Form {
-	var label, icon, hotkey string
-	var action func()
-	switch delta {
-	case -1:
-		hotkey = "left"
-		icon = "fa fa-arrow-left"
-		action = g.PrevLevel
-	case 1:
-		hotkey = "right"
-		icon = "fa fa-arrow-right"
-		action = g.NextLevel
-	default:
-		label = "Ctrl+R"
-		icon = "fa fa-refresh"
-		hotkey = "ctrl+r"
-		action = g.Reset
-	}
-	return g.Form().Mode("inline").WrapWithPanel(false).Submit(
-		func(s schema.Schema) error {
-			action()
-			return nil
-		}).
-		Body(
-			g.Button().ActionType("submit").Label(label).Icon(icon).HotKey(hotkey).Reload(g.sceneName),
-		)
-}
-
 func (g *Game) SucceedMsg() string {
 	return succeedMsgs[g.rd.Intn(len(succeedMsgs))]
-}
-
-func (g *Game) StateUI(info string) comp.Tpl {
-	infoClass := "text-xl font-bold text-info"
-	return g.App.Tpl().Tpl(info).ClassName(infoClass)
-}
-
-func (g *Game) SucceedUI() comp.Tpl {
-	return g.App.Tpl().Tpl(g.SucceedMsg()).ClassName("text-2xl font-bold text-success")
-}
-
-func (g *Game) DescriptionUI(description string) comp.Tpl {
-	return g.App.Tpl().Tpl(description).ClassName("text-xl text-gray-500")
-}
-
-func (g *Game) Main(succeed bool, state, description string, main any) any {
-	var top comp.Tpl
-	if succeed {
-		top = g.SucceedUI()
-	} else {
-		top = g.StateUI(state)
-	}
-	return g.App.Service().Body(
-		g.App.Flex().Items(top),
-		g.App.Wrapper(),
-		g.App.Flex().Items(main),
-		g.App.Wrapper(),
-		g.App.Flex().Items(g.DescriptionUI(description)),
-		g.App.Divider(),
-		g.LevelUI(),
-	)
-}
-
-func (g *Game) Service() comp.Service {
-	return g.App.Service().Name(g.sceneName).GetSchema(g.sceneFn).Messages(schema.Schema{}).SilentPolling(false)
 }

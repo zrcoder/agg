@@ -1,12 +1,8 @@
-package hanoi
+package pkg
 
 import (
 	"log"
 	"net/http"
-)
-
-const (
-	wsPath = "/hanoi/ws"
 )
 
 func (g *Game) wsHandler(w http.ResponseWriter, r *http.Request) {
@@ -18,11 +14,11 @@ func (g *Game) wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer g.wsConn.Close()
 
-	g.updateUI()
+	g.UpdateUI()
 
 	select {}
 }
 
-func (g *Game) updateUI() error {
-	return g.wsConn.WriteJSON(map[string]any{sceneName: g.Main()})
+func (g *Game) UpdateUI() error {
+	return g.wsConn.WriteJSON(map[string]any{g.sceneName: g.sceneFn()})
 }

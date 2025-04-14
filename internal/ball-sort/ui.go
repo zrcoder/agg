@@ -13,10 +13,6 @@ const (
 	Title     = "Ball Sort Puzzle"
 )
 
-func (g *Game) UI() comp.Service {
-	return g.Game.Service()
-}
-
 func (g *Game) Main() any {
 	return g.Game.Main(
 		g.IsDone(),
@@ -89,7 +85,7 @@ func (g *Game) makeBottleForms() {
 		g.bottleForms[i] = g.Form().WrapWithPanel(false).Submit(
 			func(s schema.Schema) error {
 				g.SelectBottle(i)
-				return nil
+				return g.UpdateUI()
 			},
 		)
 	}

@@ -22,4 +22,5 @@ func C() {
 func tap(p *hanoi.Pile) {
 	internal.Agg.Hanoi.SelectPile(p)
 	time.Sleep(500 * time.Millisecond)
+	internal.Agg.Hanoi.UpdateUI()
 }

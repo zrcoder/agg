@@ -12,6 +12,7 @@ func WithLevels(levels []Level, reset func()) Option {
 func WithScene(sceneName string, sceneFn func() any) Option {
 	return func(g *Game) {
 		g.sceneName = sceneName
+		g.wsPath = "/ws/" + sceneName
 		g.sceneFn = sceneFn
 	}
 }

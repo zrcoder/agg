@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gorilla/websocket"
 	"github.com/zrcoder/agg/pkg"
 	"github.com/zrcoder/amisgo"
 )
@@ -19,13 +18,10 @@ type Game struct {
 	PileA      *Pile
 	PileB      *Pile
 	PileC      *Pile
-	piles      []*Pile
 	ShiftDisk  *Disk
 	colors     []string
 	steps      int
 	CodeAction func(string, func() error) error
-	wsConn     *websocket.Conn
-	wsUpgrader websocket.Upgrader
 }
 
 type Pile struct {
@@ -43,22 +39,19 @@ func New(app *amisgo.App, codeAction func(string, func() error) error) *Game {
 	g := &Game{
 		App: app,
 		colors: []string{
-			"red", "green", "blue", "yellow", "brown", "pink", // "purple", "orange",
+			"red", "green", "blue", "yellow", "brown", "pink",
 		},
 		CodeAction: codeAction,
 	}
 	base := pkg.New(
 		app,
-		pkg.WithLevels(levels, g.LevelChanged),
+		pkg.WithLevels(levels, g.Reset),
 		pkg.WithScene(sceneName, g.Main),
 	)
-	g.wsUpgrader = websocket.Upgrader{}
-	g.App.HandleFunc(wsPath, g.wsHandler)
 	g.Game = base
 	g.PileA = NewPile(g, 0)
 	g.PileB = NewPile(g, 1)
 	g.PileC = NewPile(g, 2)
-	g.piles = []*Pile{g.PileA, g.PileB, g.PileC}
 	g.Shuffle(len(g.colors), func(i, j int) {
 		g.colors[i], g.colors[j] = g.colors[j], g.colors[i]
 	})
@@ -86,11 +79,6 @@ func (g *Game) PreCodeRunning() error {
 	return nil
 }
 
-func (g *Game) LevelChanged() {
-	g.Reset()
-	g.updateUI()
-}
-
 func (g *Game) Reset() {
 	g.PileA.renewDisks()
 	g.PileB.ClearDisks()
@@ -104,27 +92,21 @@ func (g *Game) IsDone() bool {
 }
 
 func (g *Game) SelectPile(pile *Pile) (err error) {
-	defer func() {
-		if err == nil {
-			err = g.updateUI()
-		}
-	}()
-
 	if g.IsDone() {
 		err = errors.New("game is done")
 		return
 	}
-	if g.ShiftDisk != nil {
-		if g.ShiftDisk.Pile == pile || pile.Empty() || pile.Top().ID > g.ShiftDisk.ID {
-			pile.Push(g.ShiftDisk)
-			g.ShiftDisk = nil
-			g.steps++
-			return
-		}
-		err = errors.New("invalid move")
+	if g.ShiftDisk == nil {
+		g.ShiftDisk = pile.Pop()
 		return
 	}
-	g.ShiftDisk = pile.Pop()
+	if g.ShiftDisk.Pile == pile || pile.Empty() || pile.Top().ID > g.ShiftDisk.ID {
+		pile.Push(g.ShiftDisk)
+		g.ShiftDisk = nil
+		g.steps++
+		return
+	}
+	err = errors.New("invalid move")
 	return
 }
 

@@ -11,12 +11,6 @@ const (
 	sceneName = "hanoi"
 )
 
-func (g *Game) UI() comp.Service {
-	return g.App.Service().Name(sceneName).Ws(wsPath).Body(
-		g.Amis().Name(sceneName),
-	)
-}
-
 func (g *Game) Main() any {
 	return g.Form().WrapWithPanel(false).ColumnCount(2).AutoFocus(true).
 		Submit(
