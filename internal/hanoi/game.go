@@ -14,7 +14,7 @@ const (
 
 type Game struct {
 	*amisgo.App
-	*pkg.Game
+	*pkg.Base
 	PileA      *Pile
 	PileB      *Pile
 	PileC      *Pile
@@ -48,7 +48,7 @@ func New(app *amisgo.App, codeAction func(string, func() error) error) *Game {
 		pkg.WithLevels(levels, g.Reset),
 		pkg.WithScene(sceneName, g.Main),
 	)
-	g.Game = base
+	g.Base = base
 	g.PileA = NewPile(g, 0)
 	g.PileB = NewPile(g, 1)
 	g.PileC = NewPile(g, 2)

@@ -1,5 +1,5 @@
 gen: 
-	@igop export -outdir ./internal/exported ./pkg/api/hanoi
+	@igop export -outdir ./internal/exported ./pkg/export/hanoi
 
 clean: 
 	@rm -rf internal/exported

@@ -1,48 +1,54 @@
 package pkg
 
-import "github.com/zrcoder/amisgo/comp"
+import (
+	"github.com/zrcoder/amisgo/comp"
+)
 
-func (g *Game) Shuffle(n int, swap func(i, j int)) {
-	g.rd.Shuffle(n, swap)
+func (b *Base) Shuffle(n int, swap func(i, j int)) {
+	b.rd.Shuffle(n, swap)
 }
 
-func (g *Game) LevelUI() comp.Flex {
-	return g.App.Flex().Items(
-		g.PrevForm,
-		g.App.Tpl().Tpl(g.CurrentLevel().Name).ClassName("text-xl font-bold text-info pr-3"),
-		g.NextForm,
-		g.App.Wrapper(),
-		g.ResetForm,
+func (b *Base) CurrentLevel() Level {
+	return b.levels[b.levelIndex]
+}
+
+func (b *Base) LevelUI() comp.Flex {
+	return b.App.Flex().Items(
+		b.PrevForm,
+		b.App.Tpl().Tpl(b.CurrentLevel().Name).ClassName("text-xl font-bold text-info pr-3"),
+		b.NextForm,
+		b.App.Wrapper(),
+		b.ResetForm,
 	)
 }
 
-func (g *Game) StateUI(info string) comp.Tpl {
-	infoClass := "text-xl font-bold text-info"
-	return g.App.Tpl().Tpl(info).ClassName(infoClass)
+func (b *Base) StateUI(info string) comp.Tpl {
+	return b.App.Tpl().Tpl(info).ClassName("text-xl font-bold text-info")
 }
 
-func (g *Game) SucceedUI() comp.Tpl {
-	return g.App.Tpl().Tpl(g.SucceedMsg()).ClassName("text-2xl font-bold text-success")
+func (b *Base) SuccessUI() comp.Tpl {
+	msg := b.successMsgs[b.rd.IntN(len(b.successMsgs))]
+	return b.App.Tpl().Tpl(msg).ClassName("text-2xl font-bold text-success")
 }
 
-func (g *Game) DescriptionUI(description string) comp.Tpl {
-	return g.App.Tpl().Tpl(description).ClassName("text-xl text-gray-500")
+func (b *Base) DescriptionUI(description string) comp.Tpl {
+	return b.App.Tpl().Tpl(description).ClassName("text-xl text-gray-500")
 }
 
-func (g *Game) Main(succeed bool, state, description string, main any) any {
+func (b *Base) Main(succeed bool, state, description string, main any) any {
 	var top comp.Tpl
 	if succeed {
-		top = g.SucceedUI()
+		top = b.SuccessUI()
 	} else {
-		top = g.StateUI(state)
+		top = b.StateUI(state)
 	}
-	return g.App.Service().Body(
-		g.App.Flex().Items(top),
-		g.App.Wrapper(),
-		g.App.Flex().Items(main),
-		g.App.Wrapper(),
-		g.App.Flex().Items(g.DescriptionUI(description)),
-		g.App.Divider(),
-		g.LevelUI(),
+	return b.App.Service().Body(
+		b.App.Flex().Items(top),
+		b.App.Wrapper(),
+		b.App.Flex().Items(main),
+		b.App.Wrapper(),
+		b.App.Flex().Items(b.DescriptionUI(description)),
+		b.App.Divider(),
+		b.LevelUI(),
 	)
 }

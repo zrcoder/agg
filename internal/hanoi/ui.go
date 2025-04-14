@@ -51,9 +51,9 @@ func (g *Game) Main() any {
 
 func (g *Game) stateUI() comp.Tpl {
 	if g.IsDone() {
-		return g.SucceedUI()
+		return g.Base.SuccessUI()
 	}
-	return g.StateUI(g.State())
+	return g.Base.StateUI(g.State())
 }
 
 func (g *Game) pilesUI() comp.Service {

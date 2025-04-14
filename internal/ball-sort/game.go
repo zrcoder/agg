@@ -25,7 +25,7 @@ var levels = []pkg.Level{
 
 type Game struct {
 	*amisgo.App
-	*pkg.Game
+	*pkg.Base
 	Bottles          []*Bottle
 	ShiftBall        *Ball
 	DoneBottlesCount int
@@ -56,14 +56,14 @@ func New(app *amisgo.App) *Game {
 		pkg.WithLevels(levels, g.Reset),
 		pkg.WithScene(sceneName, g.Main),
 	)
-	g.Game = base
+	g.Base = base
 	g.makeBottleForms()
 	g.Reset()
 	return g
 }
 
 func (g *Game) Reset() {
-	g.Shuffle(len(g.colors), func(i, j int) {
+	g.Base.Shuffle(len(g.colors), func(i, j int) {
 		g.colors[i], g.colors[j] = g.colors[j], g.colors[i]
 	})
 	n := g.CurrentLevel().Value
@@ -73,7 +73,7 @@ func (g *Game) Reset() {
 			balls = append(balls, &Ball{Type: i})
 		}
 	}
-	g.Shuffle(len(balls), func(i, j int) {
+	g.Base.Shuffle(len(balls), func(i, j int) {
 		balls[i], balls[j] = balls[j], balls[i]
 	})
 	g.Bottles = make([]*Bottle, 0, n+EmptyBottles)
@@ -94,7 +94,7 @@ func (g *Game) Reset() {
 		}
 		g.Bottles = append(g.Bottles, bottle)
 	}
-	g.Shuffle(len(g.Bottles), func(i, j int) {
+	g.Base.Shuffle(len(g.Bottles), func(i, j int) {
 		g.Bottles[i], g.Bottles[j] = g.Bottles[j], g.Bottles[i]
 	})
 	for i, bottle := range g.Bottles {

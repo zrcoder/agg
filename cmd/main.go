@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/zrcoder/agg/internal"
-	_ "github.com/zrcoder/agg/internal/exported/github.com/zrcoder/agg/pkg/api/hanoi"
+	_ "github.com/zrcoder/agg/internal/exported/github.com/zrcoder/agg/pkg/export/hanoi"
 
 	"github.com/goplus/igop"
 	_ "github.com/goplus/igop/gopbuild"
@@ -17,7 +17,7 @@ const (
 
 	hanoiPreCodes = `
 	import (
-		. "github.com/zrcoder/agg/pkg/api/hanoi"
+		. "github.com/zrcoder/agg/pkg/export/hanoi"
 	)
 
 	var (

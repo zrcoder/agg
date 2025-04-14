@@ -1,18 +1,18 @@
 package pkg
 
-type Option func(*Game)
+type Option func(*Base)
 
 func WithLevels(levels []Level, reset func()) Option {
-	return func(g *Game) {
-		g.levels = levels
-		g.reset = reset
+	return func(b *Base) {
+		b.levels = levels
+		b.reset = reset
 	}
 }
 
 func WithScene(sceneName string, sceneFn func() any) Option {
-	return func(g *Game) {
-		g.sceneName = sceneName
-		g.wsPath = "/ws/" + sceneName
-		g.sceneFn = sceneFn
+	return func(b *Base) {
+		b.sceneName = sceneName
+		b.wsPath = "/ws/" + sceneName
+		b.sceneFn = sceneFn
 	}
 }

@@ -3,7 +3,7 @@
 package hanoi
 
 import (
-	q "github.com/zrcoder/agg/pkg/api/hanoi"
+	q "github.com/zrcoder/agg/pkg/export/hanoi"
 
 	"reflect"
 
@@ -13,7 +13,7 @@ import (
 func init() {
 	igop.RegisterPackage(&igop.Package{
 		Name: "hanoi",
-		Path: "github.com/zrcoder/agg/pkg/api/hanoi",
+		Path: "github.com/zrcoder/agg/pkg/export/hanoi",
 		Deps: map[string]string{
 			"github.com/zrcoder/agg/internal":       "internal",
 			"github.com/zrcoder/agg/internal/hanoi": "hanoi",
