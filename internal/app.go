@@ -1,7 +1,6 @@
 package internal
 
 import (
-	_ "embed"
 	"fmt"
 	"net/http"
 
@@ -14,9 +13,6 @@ import (
 	"github.com/zrcoder/amisgo/comp"
 	"github.com/zrcoder/amisgo/conf"
 )
-
-//go:embed static/bottole-button.css
-var customCSS string
 
 const Title = "Amisgo Games"
 
@@ -37,7 +33,7 @@ func Run(hanoiCodeAction func(string, func() error) error) {
 			conf.Theme{Value: conf.ThemeAntd, Icon: "fa fa-sun"},
 		),
 		conf.WithLocalSdk(http.FS(sdk.FS)),
-		conf.WithCustomCSS(customCSS),
+		conf.WithStyles("/static/bottole-button.css"),
 		conf.WithIcon("/static/agg.svg"),
 	)
 	Agg = &App{
