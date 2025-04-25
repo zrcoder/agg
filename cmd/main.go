@@ -9,7 +9,6 @@ import (
 
 	"github.com/goplus/igop"
 	_ "github.com/goplus/igop/gopbuild"
-	_ "github.com/goplus/igop/gopbuild/pkg"
 )
 
 const (
