@@ -48,7 +48,7 @@ func New(app *amisgo.App) *Game {
 	g := &Game{
 		App: app,
 		colors: []string{
-			"red", "green", "blue", "yellow", "brown", "pink", "purple", "orange",
+			"red", "green", "blue", "yellow", "violet", "pink", "purple", "orange",
 		},
 	}
 	base := pkg.New(
