@@ -29,8 +29,8 @@ func Run(hanoiCodeAction func(string, func() error) error) {
 	app := amisgo.New(
 		conf.WithTitle(Title),
 		conf.WithThemes(
-			conf.Theme{Value: conf.ThemeDark, Icon: "fa fa-moon"},
 			conf.Theme{Value: conf.ThemeAntd, Icon: "fa fa-sun"},
+			conf.Theme{Value: conf.ThemeDark, Icon: "fa fa-moon"},
 		),
 		conf.WithLocalSdk(http.FS(sdk.FS)),
 		conf.WithStyles("/static/bottole-button.css"),
