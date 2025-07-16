@@ -6,6 +6,7 @@ import (
 
 	ballsort "github.com/zrcoder/agg/internal/ball-sort"
 	"github.com/zrcoder/agg/internal/hanoi"
+	icemagic "github.com/zrcoder/agg/internal/ice-magic"
 	"github.com/zrcoder/agg/internal/static"
 
 	sdk "gitee.com/rdor/amis-sdk/v6"
@@ -20,6 +21,7 @@ type App struct {
 	*amisgo.App
 	Hanoi           *hanoi.Game
 	BallSort        *ballsort.Game
+	IceMagic        *icemagic.Game
 	HanoiCodeAction func(string) error
 }
 
@@ -40,6 +42,7 @@ func Run(hanoiCodeAction func(string, func() error) error) {
 		App:      app,
 		Hanoi:    hanoi.New(app, hanoiCodeAction),
 		BallSort: ballsort.New(app),
+		IceMagic: icemagic.New(app),
 	}
 
 	app.StaticFS("/static", http.FS(static.FS))
@@ -58,6 +61,7 @@ func index() comp.Page {
 			app.Tabs().TabsMode("vertical").ClassName("border-none").Tabs(
 				app.Tab().Title("Ball Sort Puzzle").Hash("ball-sort").Tab(Agg.BallSort.UI()),
 				app.Tab().Title("Tower of Hanoi").Hash("hanoi").Tab(Agg.Hanoi.UI()),
+				app.Tab().Title("Ice Magic").Hash("ice-magic").Tab(Agg.IceMagic.UI()),
 			),
 		)
 }
