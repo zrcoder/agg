@@ -16,24 +16,15 @@ type Game struct {
 	grid [][]byte
 }
 
-const (
-	sceneName = "ice-magic"
-
-	Empty = ' '
-	Wall  = '#'
-	Fire  = 'f'
-	Magic = 'g'
-	Ice   = 'i'
-)
-
 func New(app *amisgo.App) *Game {
 	g := &Game{
 		App: app,
 	}
-	levels := make([]pkg.Level, 2)
+	levels := make([]pkg.Level, totalLevels)
 	for i := range levels {
-		levels[i].Name = fmt.Sprintf("Level %d", i+1)
-		levels[i].Value = i + 1
+		chapter, section := calChapterSection(i)
+		levels[i].Name = fmt.Sprintf("%d-%d", chapter, section)
+		levels[i].Value = i
 	}
 	base := pkg.New(
 		app,
@@ -46,19 +37,12 @@ func New(app *amisgo.App) *Game {
 }
 
 func (g *Game) Reset() {
-	level := g.CurrentLevel().Value
-	chapter, err := levels.FS.ReadFile(fmt.Sprintf("%d.txt", level))
+	chapter, section := calChapterSection(g.CurrentLevel().Value)
+	data, err := levels.FS.ReadFile(fmt.Sprintf("%d/%d.txt", chapter, section))
 	if err != nil {
 		panic(err)
 	}
-	g.grid = bytes.Split(chapter, []byte{'\n'})
-}
-
-var imgdic = map[byte]string{
-	Wall:  "/static/ice-magic/wall.svg",
-	Fire:  "/static/ice-magic/fire.svg",
-	Magic: "/static/ice-magic/magic.svg",
-	Ice:   "/static/ice-magic/ice.svg",
+	g.grid = bytes.Split(data, []byte{'\n'})
 }
 
 func (g *Game) View() any {
@@ -74,16 +58,20 @@ func (g *Game) View() any {
 		}
 		trs[i] = g.App.Tr().Height("10px").Tds(tds...)
 	}
-	return g.App.Wrapper().ClassName("w-7/12").Body(
+	return g.App.Wrapper().ClassName("w-1/2").Body(
 		g.App.TableView().Padding(0).Border(false).Trs(trs...),
 	)
 }
 
 func (g *Game) Main() any {
 	return g.Base.Main(
-		false,
-		"Ice",
+		g.Done(),
+		"",
 		"",
 		g.View(),
 	)
+}
+
+func (g *Game) Done() bool {
+	return false
 }
