@@ -4,6 +4,7 @@ import (
 	"log"
 	"math/rand/v2"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -14,19 +15,22 @@ import (
 
 type Base struct {
 	*amisgo.App
-	levelIndex  int
-	levels      []Level
-	PrevForm    comp.Form
-	NextForm    comp.Form
-	ResetForm   comp.Form
-	reset       func()
-	sceneName   string
-	rd          *rand.Rand
-	successMsgs []string
-	wsPath      string
-	sceneFn     func() any
-	wsConn      *websocket.Conn
-	wsUpgrader  websocket.Upgrader
+	chapters       []Chapter
+	chapterOptions []any
+	chapterIndex   int
+	levels         []Level
+	levelOptions   []any
+	levelIndex     int
+	ResetForm      comp.Form
+	LeveSelectForm comp.Form
+	reset          func()
+	sceneName      string
+	rd             *rand.Rand
+	successMsgs    []string
+	wsPath         string
+	sceneFn        func() any
+	wsConn         *websocket.Conn
+	wsUpgrader     websocket.Upgrader
 }
 
 func New(app *amisgo.App, opts ...Option) *Base {
@@ -71,51 +75,46 @@ func (b *Base) UI() comp.Service {
 }
 
 func (b *Base) makeLevelForms() {
-	b.PrevForm = b.levelForm(-1)
-	b.NextForm = b.levelForm(1)
-	b.ResetForm = b.levelForm(0)
+	b.ResetForm = b.resetForm()
+	b.LeveSelectForm = b.levelSelectForm()
 }
 
-func (b *Base) levelForm(delta int) comp.Form {
-	var label, icon, hotkey string
-	var action func()
-	switch delta {
-	case -1:
-		hotkey = "left"
-		icon = "fa fa-arrow-left"
-		action = b.prevLevel
-	case 1:
-		hotkey = "right"
-		icon = "fa fa-arrow-right"
-		action = b.nextLevel
-	default:
-		label = "Ctrl+R"
-		icon = "fa fa-refresh"
-		hotkey = "ctrl+r"
-		action = b.reset
-	}
+func (b *Base) resetForm() comp.Form {
 	return b.Form().Mode("inline").WrapWithPanel(false).Submit(
 		func(s schema.Schema) error {
-			action()
+			b.reset()
 			return b.UpdateUI()
 		}).
 		Body(
-			b.Button().ActionType("submit").Label(label).Icon(icon).HotKey(hotkey),
+			b.Button().ActionType("submit").Label("Ctrl+R").Icon("fa fa-refresh").HotKey("ctrl+r"),
 		)
 }
 
-func (b *Base) prevLevel() {
-	if b.levelIndex == 0 {
-		return
+func (b *Base) levelSelectForm() comp.Form {
+	var options []any
+	var value string
+	if len(b.chapters) > 0 {
+		options = b.chapterOptions
+		value = makeChapterLevelOptionValue(b.chapterIndex, b.levelIndex)
+	} else {
+		options = b.levelOptions
+		value = b.levels[b.LevelIndex()].Value
 	}
-	b.levelIndex--
-	b.reset()
-}
-
-func (b *Base) nextLevel() {
-	if b.levelIndex == len(b.levels)-1 {
-		return
-	}
-	b.levelIndex++
-	b.reset()
+	const levelSelectID = "levelSelect"
+	return b.Form().Mode("inline").WrapWithPanel(false).SubmitOnChange(true).Submit(
+		func(s schema.Schema) error {
+			index := s.Get(levelSelectID).(string)
+			if len(b.chapters) == 0 {
+				b.levelIndex, _ = strconv.Atoi(index)
+			} else {
+				b.chapterIndex, b.levelIndex = calChapterLevelIndex(index)
+			}
+			b.reset()
+			return b.UpdateUI()
+		}).
+		Body(
+			b.Select().Name(levelSelectID).Label("LEVEL").SelectMode("chained").LabelClassName("text-xl font-bold").Value(value).Options(
+				options...,
+			),
+		)
 }

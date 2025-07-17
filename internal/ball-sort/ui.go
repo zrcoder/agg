@@ -16,7 +16,7 @@ const (
 func (g *Game) Main() any {
 	return g.Base.Main(
 		g.IsDone(),
-		fmt.Sprintf("Done: %d/%d", g.DoneBottlesCount, g.CurrentLevel().Value),
+		fmt.Sprintf("Done: %d/%d", g.DoneBottlesCount, g.currentBallTubes()),
 		"Click any bottle or press the bottle key to select a bottle.",
 		g.bottlesUI(),
 	)

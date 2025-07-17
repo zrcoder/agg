@@ -88,7 +88,7 @@ func (g *Game) Reset() {
 }
 
 func (g *Game) IsDone() bool {
-	return len(g.PileC.Disks) == g.CurrentLevel().Value
+	return len(g.PileC.Disks) == g.CurrentLevel().Disks
 }
 
 func (g *Game) SelectPile(pile *Pile) (err error) {
@@ -111,7 +111,7 @@ func (g *Game) SelectPile(pile *Pile) (err error) {
 }
 
 func (g *Game) MinSteps() int {
-	return (1 << g.CurrentLevel().Value) - 1
+	return (1 << g.CurrentLevel().Disks) - 1
 }
 
 func (g *Game) State() string {
@@ -142,7 +142,7 @@ func (p *Pile) Pop() *Disk {
 
 func (p *Pile) renewDisks() {
 	p.Disks = p.Disks[:0]
-	n := p.CurrentLevel().Value
+	n := p.CurrentLevel().Disks
 	for i := 0; i < n; i++ {
 		p.Disks = append(p.Disks, NewDisk(p, n-1-i))
 	}

@@ -24,18 +24,9 @@ func (g *Game) Main() any {
 			},
 		).
 		Body(
-			g.Flex().Items(g.stateUI()),
-			g.Wrapper().ClassName("w-1/2").Body(g.pilesUI()),
-			g.Wrapper().ClassName("w-1/2").Body(
-				g.App.Editor().Size("xxl").Language("go").Name("code").Options(g.editorOptions()),
-			),
 			g.Flex().ClassName("pt-4").Items(
-				g.Button().Label("Go").Icon("fa fa-play").Primary(true).ActionType("submit").HotKey("ctrl+g"),
-				g.Wrapper(),
+				g.LeveSelectForm,
 				g.ResetForm,
-				g.PrevForm,
-				g.App.Tpl().Tpl(g.CurrentLevel().Name).ClassName("text-xl font-bold text-info pr-3"),
-				g.NextForm,
 				g.Wrapper(),
 				g.Button().Icon("fa fa-question").Label("Help").ActionType("drawer").Drawer(
 					g.Drawer().Size("lg").
@@ -45,6 +36,14 @@ func (g *Game) Main() any {
 							g.Editor().AllowFullscreen(false).Language("go").Disabled(true).Value(g.CurrentLevel().Help.Code).Size("xxl").Options(g.editorOptions()),
 						),
 				),
+				g.Wrapper(),
+				g.Button().Label("Go").Icon("fa fa-play").Primary(true).ActionType("submit").HotKey("ctrl+g"),
+			),
+
+			g.Flex().Items(g.stateUI()),
+			g.Wrapper().ClassName("w-1/2").Body(g.pilesUI()),
+			g.Wrapper().ClassName("w-1/2").Body(
+				g.App.Editor().Size("xxl").Language("go").Name("code").Options(g.editorOptions()),
 			),
 		)
 }

@@ -7,21 +7,9 @@ import (
 )
 
 const (
-	LevelEasy   = "EASY"
-	LevelMedium = "MEDIUM"
-	LevelHard   = "HARD"
-	LevelExpert = "EXPERT"
-
 	BottleBallCount = 4
 	EmptyBottles    = 2
 )
-
-var levels = []pkg.Level{
-	{Name: LevelEasy, Value: 5},
-	{Name: LevelMedium, Value: 6},
-	{Name: LevelHard, Value: 7},
-	{Name: LevelExpert, Value: 8},
-}
 
 type Game struct {
 	*amisgo.App
@@ -66,7 +54,7 @@ func (g *Game) Reset() {
 	g.Base.Shuffle(len(g.colors), func(i, j int) {
 		g.colors[i], g.colors[j] = g.colors[j], g.colors[i]
 	})
-	n := g.CurrentLevel().Value
+	n := g.currentBallTubes()
 	balls := make([]*Ball, 0, n*BottleBallCount)
 	for i := 0; i < n; i++ {
 		for j := 0; j < BottleBallCount; j++ {
@@ -141,7 +129,7 @@ func (g *Game) SelectBottle(i int) {
 }
 
 func (g *Game) IsDone() bool {
-	return g.DoneBottlesCount == g.CurrentLevel().Value
+	return g.DoneBottlesCount == g.currentBallTubes()
 }
 
 func (b *Bottle) Pop() *Ball {

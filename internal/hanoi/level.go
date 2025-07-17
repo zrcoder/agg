@@ -70,9 +70,24 @@ solve 5, a, b, c
 `
 )
 
+type Level struct {
+	Disks int
+	Help  Help
+}
+
+type Help struct {
+	Title string
+	Info  string
+	Code  string
+}
+
 var levels = []pkg.Level{
-	{Name: "Easy", Value: 2, Help: pkg.Help{Title: "Level: Easy", Info: easyLevelInfo, Code: easyLevelCode}},
-	{Name: "Medium", Value: 3, Help: pkg.Help{Title: "Level: Medium", Info: mediumLevelInfo, Code: mediumLevelCode}},
-	{Name: "Hard", Value: 5, Help: pkg.Help{Title: "Level: Hard", Info: hardLevelInfo, Code: hardLevelCode}},
-	{Name: "Expert", Value: 6, Help: pkg.Help{Title: "Level: Expert", Info: expertLevelInfo, Code: expertLevelCode}},
+	{Label: "Easy", Data: Level{Disks: 2, Help: Help{Title: "Level: Easy", Info: easyLevelInfo, Code: easyLevelCode}}},
+	{Label: "Medium", Data: Level{Disks: 3, Help: Help{Title: "Level: Medium", Info: mediumLevelInfo, Code: mediumLevelCode}}},
+	{Label: "Hard", Data: Level{Disks: 5, Help: Help{Title: "Level: Hard", Info: hardLevelInfo, Code: hardLevelCode}}},
+	{Label: "Expert", Data: Level{Disks: 6, Help: Help{Title: "Level: Expert", Info: expertLevelInfo, Code: expertLevelCode}}},
+}
+
+func (g *Game) CurrentLevel() Level {
+	return levels[g.Base.LevelIndex()].Data.(Level)
 }
