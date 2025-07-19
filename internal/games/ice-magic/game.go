@@ -1,10 +1,6 @@
 package icemagic
 
 import (
-	"bytes"
-	"fmt"
-
-	"github.com/zrcoder/agg/internal/games/ice-magic/levels"
 	"github.com/zrcoder/agg/pkg"
 	"github.com/zrcoder/amisgo"
 )
@@ -13,7 +9,7 @@ type Game struct {
 	*amisgo.App
 	*pkg.Base
 	chapters []pkg.Chapter
-	grid     [][]byte
+	grid     [][]*Sprite
 }
 
 func New(app *amisgo.App) *Game {
@@ -34,11 +30,7 @@ func New(app *amisgo.App) *Game {
 
 func (g *Game) Reset() {
 	chapter, level := g.Base.ChapterIndex(), g.Base.LevelIndex()
-	data, err := levels.FS.ReadFile(fmt.Sprintf("%d/%d.txt", chapter+1, level+1))
-	if err != nil {
-		panic(err)
-	}
-	g.grid = bytes.Split(data, []byte{'\n'})
+	g.grid = g.parseGrid(chapter, level)
 }
 
 func (g *Game) Done() bool {
