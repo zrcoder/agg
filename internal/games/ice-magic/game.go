@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/zrcoder/agg/internal/ice-magic/levels"
+	"github.com/zrcoder/agg/internal/games/ice-magic/levels"
 	"github.com/zrcoder/agg/pkg"
 	"github.com/zrcoder/amisgo"
 )

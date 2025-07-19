@@ -1,4 +1,4 @@
-// export by github.com/goplus/igop/cmd/qexp
+// export by github.com/goplus/ixgo/cmd/qexp
 
 package hanoi
 
@@ -7,17 +7,17 @@ import (
 
 	"reflect"
 
-	"github.com/goplus/igop"
+	"github.com/goplus/ixgo"
 )
 
 func init() {
-	igop.RegisterPackage(&igop.Package{
+	ixgo.RegisterPackage(&ixgo.Package{
 		Name: "hanoi",
 		Path: "github.com/zrcoder/agg/pkg/export/hanoi",
 		Deps: map[string]string{
-			"github.com/zrcoder/agg/internal":       "internal",
-			"github.com/zrcoder/agg/internal/hanoi": "hanoi",
-			"time":                                  "time",
+			"github.com/zrcoder/agg/internal":             "internal",
+			"github.com/zrcoder/agg/internal/games/hanoi": "hanoi",
+			"time": "time",
 		},
 		Interfaces: map[string]reflect.Type{},
 		NamedTypes: map[string]reflect.Type{},
@@ -28,7 +28,7 @@ func init() {
 			"B": reflect.ValueOf(q.B),
 			"C": reflect.ValueOf(q.C),
 		},
-		TypedConsts:   map[string]igop.TypedConst{},
-		UntypedConsts: map[string]igop.UntypedConst{},
+		TypedConsts:   map[string]ixgo.TypedConst{},
+		UntypedConsts: map[string]ixgo.UntypedConst{},
 	})
 }

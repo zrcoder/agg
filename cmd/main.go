@@ -7,8 +7,8 @@ import (
 	"github.com/zrcoder/agg/internal"
 	_ "github.com/zrcoder/agg/internal/exported/github.com/zrcoder/agg/pkg/export/hanoi"
 
-	"github.com/goplus/igop"
-	_ "github.com/goplus/igop/gopbuild"
+	"github.com/goplus/ixgo"
+	_ "github.com/goplus/ixgo/xgobuild"
 )
 
 const (
@@ -38,7 +38,7 @@ func hanoiCodeAction(code string, preAction func() error) error {
 		return err
 	}
 	code = hanoiPreCodes + code
-	_, err = igop.RunFile(gopfileName, code, nil, 0)
+	_, err = ixgo.RunFile(gopfileName, code, nil, 0)
 	return err
 }
 

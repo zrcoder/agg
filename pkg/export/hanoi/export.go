@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/zrcoder/agg/internal"
-	"github.com/zrcoder/agg/internal/hanoi"
+	"github.com/zrcoder/agg/internal/games/hanoi"
 )
 
 func A() {
