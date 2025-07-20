@@ -1,9 +1,5 @@
 package pkg
 
-import (
-	"strconv"
-)
-
 type Option func(*Base)
 
 func WithScene(sceneName string, sceneFn func() any) Option {
@@ -19,7 +15,7 @@ func WithLevels(levels []Level, reset func()) Option {
 		b.levels = levels
 		b.levelOptions = make([]any, len(levels))
 		for i := range levels {
-			b.levels[i].Value = strconv.Itoa(i)
+			b.levels[i].Value = i
 			b.levelOptions[i] = &b.levels[i]
 		}
 		b.reset = reset
@@ -31,7 +27,7 @@ func WithChapters(chapters []Chapter, reset func()) Option {
 		b.chapters = chapters
 		for i := range b.chapters {
 			for j := range b.chapters[i].Children {
-				b.chapters[i].Children[j].Value = makeChapterLevelOptionValue(i, j)
+				b.chapters[i].Children[j].Value = LevelMeta{Chapter: i, Level: j}
 			}
 		}
 		b.chapterOptions = make([]any, len(chapters))

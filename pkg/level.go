@@ -1,10 +1,6 @@
 package pkg
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
-
 	"github.com/zrcoder/amisgo/comp"
 )
 
@@ -17,7 +13,12 @@ type Chapter struct {
 type Level struct {
 	Label string `json:"label"`
 	Data  any    `json:"-"`
-	Value string `json:"value"` // inner matained, dont't chage or use
+	Value any    `json:"value"` // Value is a inner field
+}
+
+type LevelMeta struct {
+	Chapter int `json:"chapter"`
+	Level   int `json:"level"`
 }
 
 func (b *Base) LevelIndex() int {
@@ -33,15 +34,4 @@ func (b *Base) LevelUI() comp.Flex {
 		b.LeveSelectForm,
 		b.ResetForm,
 	)
-}
-
-func makeChapterLevelOptionValue(chapter, level int) string {
-	return fmt.Sprintf("%d:%d", chapter, level)
-}
-
-func calChapterLevelIndex(optionValue string) (chapter, level int) {
-	arr := strings.SplitN(optionValue, ":", 2)
-	chapter, _ = strconv.Atoi(arr[0])
-	level, _ = strconv.Atoi(arr[1])
-	return
 }

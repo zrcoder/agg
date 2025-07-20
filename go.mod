@@ -6,7 +6,7 @@ require (
 	gitee.com/rdor/amis-sdk/v6 v6.12.0
 	github.com/goplus/ixgo v0.52.0
 	github.com/gorilla/websocket v1.5.3
-	github.com/zrcoder/amisgo v0.12.3
+	github.com/zrcoder/amisgo v0.12.5
 )
 
 require (

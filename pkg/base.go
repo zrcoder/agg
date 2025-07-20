@@ -4,7 +4,6 @@ import (
 	"log"
 	"math/rand/v2"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -90,31 +89,39 @@ func (b *Base) resetForm() comp.Form {
 		)
 }
 
+const levelSelectID = "levelSelect"
+
+type ChapterLevelOptionInput struct {
+	LevelSelect LevelMeta `json:"levelSelect"`
+}
+
 func (b *Base) levelSelectForm() comp.Form {
+	form := b.Form().Mode("inline").WrapWithPanel(false).SubmitOnChange(true)
 	var options []any
-	var value string
-	if len(b.chapters) > 0 {
-		options = b.chapterOptions
-		value = makeChapterLevelOptionValue(b.chapterIndex, b.levelIndex)
-	} else {
+	var value any
+	if len(b.chapters) == 0 {
 		options = b.levelOptions
 		value = b.levels[b.LevelIndex()].Value
-	}
-	const levelSelectID = "levelSelect"
-	return b.Form().Mode("inline").WrapWithPanel(false).SubmitOnChange(true).Submit(
-		func(s schema.Schema) error {
-			index := s.Get(levelSelectID).(string)
-			if len(b.chapters) == 0 {
-				b.levelIndex, _ = strconv.Atoi(index)
-			} else {
-				b.chapterIndex, b.levelIndex = calChapterLevelIndex(index)
-			}
+		form.Submit(func(s schema.Schema) error {
+			b.levelIndex = int(s.Get(levelSelectID).(float64))
 			b.reset()
 			return b.UpdateUI()
-		}).
-		Body(
-			b.Select().Name(levelSelectID).Label("LEVEL").SelectMode("chained").LabelClassName("text-xl font-bold").Value(value).Options(
-				options...,
-			),
-		)
+		})
+	} else {
+		options = b.chapterOptions
+		value = LevelMeta{b.chapterIndex, b.levelIndex}
+		input := &ChapterLevelOptionInput{}
+		form.SubmitTo(input, func() error {
+			b.chapterIndex = input.LevelSelect.Chapter
+			b.levelIndex = input.LevelSelect.Level
+			b.reset()
+			return b.UpdateUI()
+		})
+	}
+	form.Body(
+		b.Select().
+			Name(levelSelectID).Label("LEVEL").SelectMode("chained").LabelClassName("text-xl font-bold").
+			Value(value).Options(options...),
+	)
+	return form
 }

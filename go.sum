@@ -41,8 +41,8 @@ github.com/visualfc/goembed v0.3.2 h1:a9m6o9VTzNk3mEF98C8cHp8f8P8BblyjsjajXGfTp8
 github.com/visualfc/goembed v0.3.2/go.mod h1:jCVCz/yTJGyslo6Hta+pYxWWBuq9ADCcIVZBTQ0/iVI=
 github.com/visualfc/xtype v0.2.0 h1:0ESNXyWHtK01kaOzOyqHsR1ZjEPdNu/IWPZkf0VOHl8=
 github.com/visualfc/xtype v0.2.0/go.mod h1:183MDtzLqyDkCm5zCH42vJGq/aQE5W25k3Z6UOZxLF0=
-github.com/zrcoder/amisgo v0.12.3 h1:XeV0EW0W63uLd7zgx3lVuuLCoAFpjRVJ73gvMwtzYFA=
-github.com/zrcoder/amisgo v0.12.3/go.mod h1:S9ywPkM6KkiQfeTIi7Y+6MYSBCXiO1PWi29Nu7KoUdY=
+github.com/zrcoder/amisgo v0.12.5 h1:66TB27a4XTsTElozLaPVE4Ykw4GE9HK64g6crmwdItE=
+github.com/zrcoder/amisgo v0.12.5/go.mod h1:S9ywPkM6KkiQfeTIi7Y+6MYSBCXiO1PWi29Nu7KoUdY=
 golang.org/x/mod v0.20.0 h1:utOm6MM3R3dnawAiJgn0y+xvuYRsm1RKM/4giyfDgV0=
 golang.org/x/mod v0.20.0/go.mod h1:hTbmBsO62+eylJbnUtE2MGJUyE7QWk4xUqPFrRgJ+7c=
 golang.org/x/tools v0.19.0 h1:tfGCXNR1OsFG+sVdLAitlpjAvD/I6dHDKnYrpEZUHkw=
