@@ -3,10 +3,10 @@ module github.com/zrcoder/agg
 go 1.23
 
 require (
-	gitee.com/rdor/amis-sdk/v6 v6.12.0
+	gitee.com/rdor/amis-sdk/v6 v6.13.0
 	github.com/goplus/ixgo v0.52.0
 	github.com/gorilla/websocket v1.5.3
-	github.com/zrcoder/amisgo v0.12.5
+	github.com/zrcoder/amisgo v0.13.1
 )
 
 require (
