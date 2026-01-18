@@ -1,22 +1,26 @@
 package icemagic
 
-import "github.com/zrcoder/amisgo/comp"
+import (
+	"github.com/zrcoder/agg/internal/games/ice-magic/levels"
+	"github.com/zrcoder/amisgo/comp"
+)
 
 const (
 	Blank  = ' '
-	Wall   = '#'
-	Fire   = 'f'
-	Player = 'm'
-	Ice    = 'i'
+	Wall   = '='
+	Fire   = 'F'
+	Player = 'M'
+	Ice    = 'I'
 )
 
 type Sprite struct {
 	*Game
-	Width           int
-	ID              byte
-	BackgroundColor string
-	LeftFixed       bool
-	RightFixed      bool
+	X          int
+	Y          int
+	Width      int
+	ID         byte
+	LeftFixed  bool
+	RightFixed bool
 }
 
 type Position struct {
@@ -56,4 +60,31 @@ func (s *Sprite) View() comp.Td {
 		td.Style(noBorderTdStyle)
 	}
 	return td
+}
+
+func (s *Sprite) leftSprite() (int, *Sprite) {
+	if s.X == 0 {
+		return 0, nil
+	}
+	row := s.Game.grid[s.Y]
+	i, left := 0, row[0]
+	for left.X+left.Width < s.X {
+		i++
+		left = row[i]
+	}
+	return i, left
+}
+
+func (s *Sprite) rightSprite() (int, *Sprite) {
+	if s.X+s.Width == levels.Cols {
+		return 0, nil
+	}
+	row := s.Game.grid[s.Y]
+	i := len(row) - 1
+	right := row[i]
+	for right.X > s.X+s.Width {
+		i--
+		right = row[i]
+	}
+	return i, right
 }

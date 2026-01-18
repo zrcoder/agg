@@ -9,11 +9,6 @@ import (
 )
 
 const (
-	levelsInEachChapter = 9
-	totalLevels         = 10
-)
-
-const (
 	sceneName = "ice-magic"
 )
 
@@ -64,18 +59,21 @@ func (g *Game) parseGrid(chapter, level int) [][]*Sprite {
 		j := 0
 		for j < len(row) {
 			id := row[j]
+			sprite := &Sprite{ID: id, X: j, Y: i, Width: 1, Game: g}
 			switch id {
-			case Player, Fire:
-				grid[i] = append(grid[i], &Sprite{ID: row[j], Width: 1, Game: g})
+			case Fire:
+				g.fires++
+				j++
+			case Player:
+				g.player = sprite
 				j++
 			default:
-				count := 1
 				j++
 				for ; j < len(row) && row[j] == id; j++ {
-					count++
+					sprite.Width++
 				}
-				grid[i] = append(grid[i], &Sprite{ID: id, Width: count, Game: g})
 			}
+			grid[i] = append(grid[i], sprite)
 		}
 	}
 	return grid
