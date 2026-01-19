@@ -48,26 +48,19 @@ func (g *Game) initLevels() {
 	}
 }
 
-func (g *Game) parseGrid(chapter, level int) [][]*Sprite {
+func (g *Game) parseGrid(chapter, level int) {
 	data, err := levels.FS.ReadFile(fmt.Sprintf("%d/%d.txt", chapter+1, level+1))
 	if err != nil {
 		panic(err)
 	}
+
 	lines := bytes.Split(data, []byte{'\n'})
-	grid := make([][]*Sprite, len(lines))
-	for i, line := range lines {
-		row := make([]*Sprite, 0, len(line))
-		j := 0
-		for j < len(line) {
-			id := line[j]
-			sprite := &Sprite{ID: id, X: j, Y: i, Width: 1, RowIndex: len(row), Game: g}
-			if len(row) > 0 {
-				left := row[len(row)-1]
-				left.Right = sprite
-				sprite.Left = left
-			}
-			row = append(row, sprite)
-			j++
+	g.grid = make([][]*Sprite, len(lines))
+	for y, line := range lines {
+		g.grid[y] = make([]*Sprite, len(line))
+		for x := range line {
+			id := line[x]
+			sprite := &Sprite{TypeFlag: id, Type: flagType[id], X: x, Y: y, Game: g}
 			switch id {
 			case Blank:
 			case Fire:
@@ -75,12 +68,19 @@ func (g *Game) parseGrid(chapter, level int) [][]*Sprite {
 			case Player:
 				g.player = sprite
 			case Ice:
-				for ; j < len(line) && line[j] == id; j++ {
-					sprite.Width++
-				}
+				sprite.checkToFixLeft()
+			case Wall:
+				sprite.checkToFixLeft()
 			}
+			g.grid[y][x] = sprite
 		}
-		grid[i] = row
 	}
-	return grid
+}
+
+func (s *Sprite) checkToFixLeft() {
+	left := s.Left()
+	if s.X > 0 && (left.TypeFlag == Wall || left.TypeFlag == Ice) {
+		s.LeftFixed = true
+		left.RightFixed = true
+	}
 }
