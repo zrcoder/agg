@@ -34,13 +34,11 @@ func (g *Game) buttonsPanel() comp.Wrapper {
 	return g.App.Wrapper().Body(
 		g.App.Flex().Items(
 			g.buttonForm("J", "←", func() error {
-				g.playerMoveLeft()
-				return nil
+				return g.player.moveLeft()
 			}),
 			g.App.Wrapper(),
 			g.buttonForm("L", "→", func() error {
-				g.playerMoveRight()
-				return g.UpdateUI()
+				return g.player.moveRight()
 			}),
 		),
 		g.App.Wrapper(),

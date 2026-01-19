@@ -53,28 +53,34 @@ func (g *Game) parseGrid(chapter, level int) [][]*Sprite {
 	if err != nil {
 		panic(err)
 	}
-	rows := bytes.Split(data, []byte{'\n'})
-	grid := make([][]*Sprite, len(rows))
-	for i, row := range rows {
+	lines := bytes.Split(data, []byte{'\n'})
+	grid := make([][]*Sprite, len(lines))
+	for i, line := range lines {
+		row := make([]*Sprite, 0, len(line))
 		j := 0
-		for j < len(row) {
-			id := row[j]
-			sprite := &Sprite{ID: id, X: j, Y: i, Width: 1, Game: g}
+		for j < len(line) {
+			id := line[j]
+			sprite := &Sprite{ID: id, X: j, Y: i, Width: 1, RowIndex: len(row), Game: g}
+			if len(row) > 0 {
+				left := row[len(row)-1]
+				left.Right = sprite
+				sprite.Left = left
+			}
+			row = append(row, sprite)
+			j++
 			switch id {
+			case Blank:
 			case Fire:
 				g.fires++
-				j++
 			case Player:
 				g.player = sprite
-				j++
-			default:
-				j++
-				for ; j < len(row) && row[j] == id; j++ {
+			case Ice:
+				for ; j < len(line) && line[j] == id; j++ {
 					sprite.Width++
 				}
 			}
-			grid[i] = append(grid[i], sprite)
 		}
+		grid[i] = row
 	}
 	return grid
 }

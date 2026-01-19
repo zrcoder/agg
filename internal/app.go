@@ -6,6 +6,7 @@ import (
 
 	ballsort "github.com/zrcoder/agg/internal/games/ball-sort"
 	"github.com/zrcoder/agg/internal/games/hanoi"
+
 	icemagic "github.com/zrcoder/agg/internal/games/ice-magic"
 	"github.com/zrcoder/agg/internal/static"
 
