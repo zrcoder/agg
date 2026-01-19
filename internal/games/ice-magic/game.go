@@ -57,18 +57,30 @@ func (g *Game) checkUpsFall(s *Sprite) {
 }
 
 func (g *Game) hSwap(src, dst *Sprite) bool {
+	if !g.hSwapQuite(src, dst) {
+		return false
+	}
+	time.Sleep(stepTime)
+	return g.UpdateUI() == nil
+}
+func (g *Game) hSwapQuite(src, dst *Sprite) bool {
 	if src.Y != dst.Y {
 		return false
 	}
 	row := g.grid[src.Y]
 	row[src.X], row[dst.X] = dst, src
 	src.X, dst.X = dst.X, src.X
-	time.Sleep(stepTime)
-	err := g.UpdateUI()
-	return err == nil
+	return true
 }
 
 func (g *Game) vSwap(src, dst *Sprite) bool {
+	if !g.vSwapQuite(src, dst) {
+		return false
+	}
+	time.Sleep(stepTime)
+	return g.UpdateUI() == nil
+}
+func (g *Game) vSwapQuite(src, dst *Sprite) bool {
 	if src.X != dst.X {
 		return false
 	}
@@ -77,7 +89,18 @@ func (g *Game) vSwap(src, dst *Sprite) bool {
 	oRow := g.grid[dst.Y]
 	sRow[x], oRow[x] = dst, src
 	src.Y, dst.Y = dst.Y, src.Y
-	time.Sleep(stepTime)
-	err := g.UpdateUI()
-	return err == nil
+	return true
+}
+
+func (g *Game) swap(src, dst *Sprite) bool {
+	if src == nil || dst == nil {
+		return false
+	}
+	sRow := g.grid[src.Y]
+	dRow := g.grid[dst.Y]
+	sRow[src.X], dRow[dst.X] = dst, src
+	src.X, dst.X = dst.X, src.X
+	src.Y, dst.Y = dst.Y, src.Y
+	time.Sleep(2 * stepTime)
+	return g.UpdateUI() == nil
 }

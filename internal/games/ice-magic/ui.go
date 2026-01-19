@@ -8,6 +8,9 @@ import (
 )
 
 func (g *Game) View() any {
+	if g.failed {
+		return g.App.Tpl().Tpl("Failed!").ClassName("text-2xl font-bold text-red-500 ")
+	}
 	return g.App.Wrapper().ClassName("w-2/3").Body(
 		g.App.TableView().Border(false).Trs(
 			g.App.Tr().Tds(
