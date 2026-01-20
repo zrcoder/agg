@@ -44,7 +44,7 @@ func (g *Game) Done() bool {
 	return g.fires == 0
 }
 func (g *Game) checkUpsFall(s *Sprite) {
-	if s == nil {
+	if s == nil || s.TypeFlag == Blank {
 		return
 	}
 	x := s.X

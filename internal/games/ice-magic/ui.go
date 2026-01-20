@@ -49,10 +49,12 @@ func (g *Game) buttonsPanel() comp.Wrapper {
 		g.App.Wrapper(),
 		g.App.Flex().Items(
 			g.buttonForm("A", "↙", func() error {
+				g.player.magicLeft()
 				return nil
 			}),
 			g.App.Wrapper(),
 			g.buttonForm("D", "↘", func() error {
+				g.player.magicRight()
 				return nil
 			}),
 		),
