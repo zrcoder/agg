@@ -28,7 +28,7 @@ func (g *Game) sceneView() comp.TableView {
 		for j := range line {
 			tds[j] = line[j].View()
 		}
-		trs[i] = g.App.Tr().Tds(tds...).Height("30px")
+		trs[i] = g.App.Tr().Tds(tds...).Height("38px")
 	}
 	return g.App.TableView().Padding(0).Trs(trs...)
 }

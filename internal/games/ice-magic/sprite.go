@@ -7,11 +7,12 @@ import (
 )
 
 const (
-	Blank  = ' '
-	Wall   = '='
-	Fire   = 'F'
-	Player = 'M'
-	Ice    = 'I'
+	Blank    = ' '
+	Wall     = '='
+	Fire     = 'F'
+	Player   = 'M'
+	Ice      = 'I'
+	IceFixed = 'i'
 )
 
 var (
@@ -28,7 +29,6 @@ var (
 type Sprite struct {
 	*Game
 	TypeFlag   byte
-	Type       string // just for debug and log
 	X          int
 	Y          int
 	LeftFixed  bool
@@ -56,9 +56,9 @@ func (s *Sprite) View() comp.Td {
 	case Wall:
 		td.Background("#E9967A").Style(s.borderStyle())
 	case Fire:
-		td.Body("🔥").Align("center").Style(noBorderTdStyle)
+		td.Body(s.Tpl().Tpl("🔥").ClassName("text-2xl")).Align("center").Style(noBorderTdStyle)
 	case Player:
-		td.Body("😺").Align("center").Style(noBorderTdStyle)
+		td.Body(s.Tpl().Tpl("☃︎").ClassName("text-2xl")).Align("center").Style(noBorderTdStyle)
 	case Ice:
 		td.Background("#87CEFA").Style(s.borderStyle())
 	case Blank:
