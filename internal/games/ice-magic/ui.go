@@ -1,8 +1,6 @@
 package icemagic
 
 import (
-	"fmt"
-
 	"github.com/zrcoder/amisgo/comp"
 	"github.com/zrcoder/amisgo/schema"
 )
@@ -68,7 +66,6 @@ func (g *Game) buttonForm(key, label string, action func() error) comp.Form {
 			g.App.Tpl().Text(key),
 		),
 	).Submit(func(s schema.Schema) error {
-		fmt.Println("Button triggered:", key)
 		return action()
 	})
 }

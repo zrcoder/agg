@@ -60,7 +60,7 @@ func (g *Game) parseGrid(chapter, level int) {
 		g.grid[y] = make([]*Sprite, len(line))
 		for x := range line {
 			typeFlag := line[x]
-			sprite := &Sprite{TypeFlag: typeFlag, X: x, Y: y, Game: g}
+			sprite := &Sprite{Kind: typeFlag, X: x, Y: y, Game: g}
 			g.grid[y][x] = sprite
 			switch typeFlag {
 			case Blank:
@@ -68,14 +68,12 @@ func (g *Game) parseGrid(chapter, level int) {
 				g.fires++
 			case Player:
 				g.player = sprite
-			case Ice:
-				sprite.checkToFixLeft()
-			case Wall:
+			case IceFixed, Ice, Wall:
 				sprite.checkToFixLeft()
 			}
 			left := sprite.Left()
-			if left != nil && left.TypeFlag == IceFixed {
-				left.TypeFlag = Ice
+			if left != nil && left.Kind == IceFixed {
+				left.Kind = Ice
 			}
 		}
 	}
@@ -92,12 +90,12 @@ func (s *Sprite) checkToFixLeft() {
 			left.RightFixed = true
 		}
 	}
-	switch left.TypeFlag {
+	switch left.Kind {
 	case Wall:
-		fix(s.TypeFlag == IceFixed || s.TypeFlag == Wall)
+		fix(s.Kind == IceFixed || s.Kind == Wall)
 	case IceFixed:
-		fix(s.TypeFlag == Ice || s.TypeFlag == IceFixed || s.TypeFlag == Wall)
+		fix(s.Kind == Ice || s.Kind == IceFixed || s.Kind == Wall)
 	case Ice:
-		fix(s.TypeFlag == Ice || s.TypeFlag == IceFixed)
+		fix(s.Kind == IceFixed)
 	}
 }

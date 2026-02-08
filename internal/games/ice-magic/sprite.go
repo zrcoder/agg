@@ -11,8 +11,8 @@ const (
 	Wall     = '='
 	Fire     = 'F'
 	Player   = 'M'
-	Ice      = 'I'
-	IceFixed = 'i'
+	Ice      = 'i'
+	IceFixed = 'I'
 )
 
 var (
@@ -21,7 +21,7 @@ var (
 
 type Sprite struct {
 	*Game
-	TypeFlag   byte
+	Kind       byte
 	X          int
 	Y          int
 	LeftFixed  bool
@@ -36,20 +36,24 @@ var noBorderTdStyle = map[string]int{
 }
 
 func (s *Sprite) View() comp.Td {
-	td := s.Td().Colspan(1).Width("40px")
-	switch s.TypeFlag {
-	case Wall:
-		td.Background("#E9967A").Style(s.borderStyle())
+	td := s.Td().Colspan(1).Width("40px").Align("center")
+	switch s.Kind {
 	case Fire:
-		td.Body(s.Tpl().Tpl("🔥").ClassName("text-2xl")).Align("center").Style(noBorderTdStyle)
+		td.Body(s.Tpl("🔥")).Style(noBorderTdStyle)
 	case Player:
-		td.Body(s.Tpl().Tpl("☃︎").ClassName("text-2xl")).Align("center").Style(noBorderTdStyle)
+		td.Body(s.Tpl("🐙")).Style(noBorderTdStyle)
+	case Wall:
+		td.Background("#A52A2A").Style(s.borderStyle())
 	case Ice:
 		td.Background("#87CEFA").Style(s.borderStyle())
 	case Blank:
 		td.Style(noBorderTdStyle)
 	}
 	return td
+}
+
+func (s *Sprite) Tpl(text string) comp.Tpl {
+	return s.Game.Tpl().Tpl(text).ClassName("text-2xl")
 }
 
 func (s *Sprite) borderStyle() map[string]int {
@@ -64,7 +68,7 @@ func (s *Sprite) borderStyle() map[string]int {
 }
 
 func (s *Sprite) moveLeft() bool {
-	switch s.TypeFlag {
+	switch s.Kind {
 	case Player:
 		return s.playerMoveLeft()
 	case Ice:
@@ -73,117 +77,12 @@ func (s *Sprite) moveLeft() bool {
 	return false
 }
 
-func (s *Sprite) magicLeft() {
-	if s.TypeFlag != Player {
-		return
-	}
-	s.magic(s.LeftDown())
-
-}
-func (s *Sprite) magicRight() {
-	if s.TypeFlag != Player {
-		return
-	}
-	s.magic((s.RightDown()))
-}
-func (s *Sprite) magic(dst *Sprite) {
-	if dst == nil {
-		return
-	}
-	switch dst.TypeFlag {
-	case Blank:
-		dst.TypeFlag = Ice
-		left := dst.Left()
-		if left != nil && (left.TypeFlag == Ice || left.TypeFlag == Wall) {
-			left.RightFixed = true
-			dst.LeftFixed = true
-		}
-		right := dst.Right()
-		if right != nil && (right.TypeFlag == Ice || right.TypeFlag == Wall) {
-			right.LeftFixed = true
-			dst.RightFixed = true
-		}
-		s.Game.UpdateUI()
-	case Ice:
-		dst.TypeFlag = Blank
-		dst.LeftFixed = false
-		dst.RightFixed = false
-		left := dst.Left()
-		if left != nil {
-			left.RightFixed = false
-		}
-		right := dst.Right()
-		if right != nil {
-			right.LeftFixed = false
-		}
-		s.Game.UpdateUI()
-		s.Game.checkUpsFall(s.Left())
-	}
-}
-
 func (s *Sprite) moveRight() bool {
-	switch s.TypeFlag {
+	switch s.Kind {
 	case Player:
 		return s.playerMoveRight()
 	case Ice:
 		return s.iceSlideRight()
-	}
-	return false
-}
-
-func (s *Sprite) playerMoveLeft() bool {
-	g := s.Game
-	player := g.player
-	left := player.Left()
-	if left == nil {
-		return false
-	}
-	switch left.TypeFlag {
-	case Blank:
-		up := player.Up()
-		if ok := g.hSwap(left, player); !ok {
-			return false
-		}
-		g.checkUpsFall(up)
-		return player.fall()
-	case Ice:
-		if !left.iceSlideLeft() {
-			return g.player.climbLeft()
-		}
-		return false
-	case Fire:
-		g.failed = true
-		g.UpdateUI()
-	case Wall:
-		return g.player.climbLeft()
-	default:
-	}
-	return false
-}
-
-func (s *Sprite) playerMoveRight() bool {
-	g := s.Game
-	player := s.Game.player
-	right := player.Right()
-	switch right.TypeFlag {
-	case Blank:
-		up := player.Up()
-		if ok := g.hSwap(player, right); !ok {
-			return false
-		}
-		g.checkUpsFall(up)
-		return player.fall()
-	case Ice:
-		if !right.iceSlideRight() {
-			return g.player.climbRight()
-		}
-		return false
-	case Fire:
-		g.failed = true
-		g.UpdateUI()
-	case Wall:
-		return g.player.climbRight()
-	default:
 	}
 	return false
 }
@@ -193,30 +92,24 @@ func (s *Sprite) iceSlideLeft() bool {
 	if left == nil {
 		return false
 	}
-	switch left.TypeFlag {
+	switch left.Kind {
 	case Fire:
-		s.Game.fires--
-		left.TypeFlag = Blank
-		s.TypeFlag = Blank
+		left.FireDie()
+		s.IceDie()
 		time.Sleep(stepTime)
-		err := s.Game.UpdateUI()
-		if err != nil {
-			return false
-		}
-		s.Game.checkUpsFall(left.Up())
-		s.Game.checkUpsFall(s.Up())
+		s.Game.UpdateUI()
+		s.Game.checkFall(left.Up())
+		s.Game.checkFall(s.Up())
 		return true
 	case Blank:
 		up := s.Up()
-		defer func() {
-			s.Game.checkUpsFall(up)
-		}()
-		if ok := s.Game.hSwap(left, s); !ok {
+		if ok := s.Game.swap(left, s, stepTime); !ok {
 			return false
 		}
 		if ok := s.fall(); !ok {
 			s.iceSlideLeft()
 		}
+		s.Game.checkFall(up)
 		return true
 	}
 	return false
@@ -226,33 +119,78 @@ func (s *Sprite) iceSlideRight() bool {
 	if right == nil {
 		return false
 	}
-	switch right.TypeFlag {
+	switch right.Kind {
 	case Fire:
-		s.Game.fires--
-		right.TypeFlag = Blank
-		s.TypeFlag = Blank
+		right.FireDie()
+		s.IceDie()
 		time.Sleep(stepTime)
-		err := s.Game.UpdateUI()
-		if err != nil {
-			return false
-		}
-		s.Game.checkUpsFall(right.Up())
-		s.Game.checkUpsFall(s.Up())
+		s.Game.UpdateUI()
+		s.Game.checkFall(right.Up())
+		s.Game.checkFall(s.Up())
 		return true
 	case Blank:
 		up := s.Up()
-		defer func() {
-			s.Game.checkUpsFall(up)
-		}()
-		if ok := s.Game.hSwap(s, right); !ok {
+		if ok := s.Game.swap(s, right, stepTime); !ok {
 			return false
 		}
 		if ok := s.fall(); !ok {
 			s.iceSlideRight()
 		}
+		s.Game.checkFall(up)
 		return true
 	}
 	return false
+}
+
+func (s *Sprite) fall1step() bool {
+	if s == nil || s.Y >= len(s.Game.grid) {
+		return false
+	}
+	down := s.Down()
+	switch s.Kind {
+	case Player:
+		switch down.Kind {
+		case Blank:
+			return s.Game.swapQuietly(s, down)
+		case Fire:
+			s.PlayerDie()
+			down.FireDie()
+			return true
+		}
+	case Ice:
+		switch down.Kind {
+		case Blank:
+			return s.Game.swapQuietly(s, down)
+		case Fire:
+			s.IceDie()
+			down.FireDie()
+			return true
+		}
+	case Fire:
+		if down.Kind == Blank {
+			return s.Game.swapQuietly(s, down)
+		}
+	}
+	return false
+}
+
+func (s *Sprite) climbLeft() bool {
+	return s.climb(s.LeftUp())
+}
+
+func (s *Sprite) climbRight() bool {
+	return s.climb(s.RightUp())
+}
+
+func (s *Sprite) climb(dst *Sprite) bool {
+	up := s.Up()
+	if up != nil && up.Kind != Blank {
+		return false
+	}
+	if dst == nil || dst.Kind != Blank {
+		return false
+	}
+	return s.Game.swap(s, dst, 2*stepTime)
 }
 
 func (s *Sprite) Left() *Sprite {
@@ -281,130 +219,6 @@ func (s *Sprite) Down() *Sprite {
 	}
 	return s.Game.grid[s.Y+1][s.X]
 }
-
-func (s *Sprite) fall() bool {
-	if s == nil || s.TypeFlag == Blank {
-		return false
-	}
-	g := s.Game
-	switch s.TypeFlag {
-	case Player:
-		for y := s.Y; y < len(g.grid)-1; y++ {
-			down := s.Down()
-			switch down.TypeFlag {
-			case Blank:
-				ok := g.vSwap(s, down)
-				if !ok {
-					return false
-				}
-			case Fire:
-				s.TypeFlag = Blank
-				down.TypeFlag = Blank
-				g.failed = true
-				time.Sleep(stepTime)
-				return g.UpdateUI() == nil
-			}
-		}
-		return true
-	case Ice:
-		res := false
-		for y := s.Y; y < len(g.grid)-1; y++ {
-			x1, x2, ok := s.checkIceDown()
-			if ok {
-				res = true
-				s.iceRowDown(x1, x2)
-			}
-		}
-		return res
-	case Fire:
-		for y := s.Y; y < len(g.grid)-1; y++ {
-			down := s.Down()
-			switch down.TypeFlag {
-			case Blank:
-				ok := s.Game.vSwap(s, down)
-				if !ok {
-					return false
-				}
-			}
-		}
-		return true
-	}
-	return false
-}
-
-func (s *Sprite) checkIceDown() (int, int, bool) {
-	if s.TypeFlag != Ice {
-		return 0, 0, false
-	}
-	x1, x2 := s.X, s.X
-	row := s.grid[s.Y]
-	for x1 > 0 && row[x1].LeftFixed && row[x1-1].TypeFlag == Ice {
-		x1--
-	}
-	if row[x1].LeftFixed { // ice left is fixed by wall or other sprites
-		return 0, 0, false
-	}
-	for x2 < len(row)-1 && row[x2].RightFixed && row[x2+1].TypeFlag == Ice {
-		x2++
-	}
-	if row[x2].RightFixed { // ice right is fixed by wall or other sprites
-		return 0, 0, false
-	}
-	for x := x1; x <= x2; x++ {
-		down := s.grid[s.Y+1][x]
-		if down.TypeFlag != Blank && down.TypeFlag != Fire {
-			return 0, 0, false
-		}
-	}
-	return x1, x2, true
-}
-
-func (s *Sprite) iceRowDown(x1, x2 int) bool {
-	row := s.grid[s.Y]
-	nextRow := s.grid[s.Y+1]
-	for x := x1; x <= x2; x++ {
-		ice := row[x]
-		down := nextRow[x]
-		switch down.TypeFlag {
-		case Fire:
-			s.Game.fires--
-			if x != x1 {
-				row[x-1].RightFixed = false
-			}
-			if x != x2 {
-				row[x+1].LeftFixed = false
-			}
-			ice.LeftFixed = false
-			ice.RightFixed = false
-			ice.TypeFlag = Blank
-			down.TypeFlag = Blank
-		case Blank:
-			s.Game.vSwapQuite(ice, down)
-		}
-	}
-	time.Sleep(stepTime)
-	return s.Game.UpdateUI() == nil
-}
-
-func (s *Sprite) climbLeft() bool {
-	return s.climb(s.LeftUp())
-}
-
-func (s *Sprite) climbRight() bool {
-	return s.climb(s.RightUp())
-}
-
-func (s *Sprite) climb(dst *Sprite) bool {
-	up := s.Up()
-	if up != nil && up.TypeFlag != Blank {
-		return false
-	}
-	if dst == nil || dst.TypeFlag != Blank {
-		return false
-	}
-	return s.Game.swap(s, dst)
-}
-
 func (s *Sprite) LeftUp() *Sprite {
 	left := s.Left()
 	if left == nil {
@@ -432,4 +246,108 @@ func (s *Sprite) RightDown() *Sprite {
 		return nil
 	}
 	return right.Down()
+}
+
+func (s *Sprite) IsIce() bool {
+	return s.Kind == Ice || s.Kind == IceFixed
+}
+
+func (s *Sprite) IceDie() {
+	if !s.IsIce() {
+		return
+	}
+	s.Kind = Blank
+	s.UnFix()
+}
+func (s *Sprite) FireDie() {
+	if s.Kind != Fire {
+		return
+	}
+	s.Game.fires--
+	s.Kind = Blank
+}
+func (s *Sprite) PlayerDie() {
+	if s.Kind != Player {
+		return
+	}
+	s.Game.failed = true
+	s.Kind = Blank
+}
+func (s *Sprite) UnFix() {
+	s.LeftFixed = false
+	s.RightFixed = false
+	left, right := s.Left(), s.Right()
+	if left != nil {
+		left.RightFixed = false
+	}
+	if right != nil {
+		right.LeftFixed = false
+	}
+}
+
+func (s *Sprite) getIceBar() *Bar {
+	if s == nil || !s.IsIce() {
+		return nil
+	}
+	x1, x2 := s.X, s.X
+	row := s.Game.grid[s.Y]
+	for x1 >= 0 && row[x1].IsIce() && row[x1].LeftFixed {
+		x1--
+	}
+	if !row[x1].IsIce() {
+		x1++
+	}
+	for x2 < len(row) && row[x2].IsIce() && row[x2].RightFixed {
+		x2++
+	}
+	if !row[x2].IsIce() {
+		x2--
+	}
+	return &Bar{Start: row[x1], End: row[x2]}
+}
+
+func (s *Sprite) magicLeft() {
+	if s.Kind != Player {
+		return
+	}
+	s.magic(s.LeftDown())
+
+}
+func (s *Sprite) magicRight() {
+	if s.Kind != Player {
+		return
+	}
+	s.magic((s.RightDown()))
+}
+
+func (s *Sprite) magic(dst *Sprite) {
+	if dst == nil {
+		return
+	}
+	switch dst.Kind {
+	case Blank:
+		dst.Kind = Ice
+		left := dst.Left()
+		right := dst.Right()
+		if left != nil && (left.Kind == Ice || left.Kind == Wall) {
+			left.RightFixed = true
+			dst.LeftFixed = true
+		}
+		if right != nil && (right.Kind == Ice || right.Kind == Wall) {
+			right.LeftFixed = true
+			dst.RightFixed = true
+		}
+		s.Game.UpdateUI()
+	case Ice:
+		up, left, right := dst.Up(), dst.Left(), dst.Right()
+		dst.IceDie()
+		s.Game.UpdateUI()
+		s.Game.checkFall(up)
+		s.Game.checkFall(left)
+		s.Game.checkFall(right)
+	}
+}
+
+func (s *Sprite) fall() bool {
+	return s.Game.FallBars(&Bar{s, s})
 }
