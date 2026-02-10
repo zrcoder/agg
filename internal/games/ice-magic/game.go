@@ -132,16 +132,21 @@ func (g *Game) FallBars(bars ...*Bar) bool {
 		return false
 	}
 	var upBars, newBars []*Bar
+	res := false
 	for _, b := range bars {
 		if !b.CanFall() {
 			continue
 		}
+		res = true
 		upBars = append(upBars, b.GetUpFallBars()...)
 		newBars = append(newBars, b.FallBar1StepQuietly()...)
+	}
+	if !res {
+		return res
 	}
 	time.Sleep(stepTime)
 	g.UpdateUI()
 	g.FallBars(newBars...)
 	g.FallBars(upBars...)
-	return true
+	return res
 }

@@ -1,16 +1,19 @@
 package icemagic
 
 type Bar struct {
-	Start, End *Sprite
+	Left, Right *Sprite
 }
 
 func (b *Bar) CanFall() bool {
-	g := b.Start.Game
-	if b.Start.Y >= len(g.grid)-1 {
+	g := b.Left.Game
+	if b.Left.Y >= len(g.grid)-1 {
 		return false
 	}
-	down := g.grid[b.Start.Y+1]
-	for x := b.Start.X; x <= b.End.X; x++ {
+	if b.IceFixed() {
+		return false
+	}
+	down := g.grid[b.Left.Y+1]
+	for x := b.Left.X; x <= b.Right.X; x++ {
 		switch down[x].Kind {
 		case Fire, Blank:
 		default:
@@ -21,21 +24,21 @@ func (b *Bar) CanFall() bool {
 }
 
 func (b *Bar) GetUpFallBars() []*Bar {
-	if b.Start.Y == 0 {
+	if b.Left.Y == 0 {
 		return nil
 	}
-	upRow := b.Start.Game.grid[b.Start.Y-1]
+	upRow := b.Left.Game.grid[b.Left.Y-1]
 	var res []*Bar
 	preX := -1
-	for x := b.Start.X; x <= b.End.X; x++ {
+	for x := b.Left.X; x <= b.Right.X; x++ {
 		up := upRow[x]
 		switch up.Kind {
 		case Wall, Blank:
 		default:
 			bar := up.Bar()
-			if bar.Start.X > preX {
+			if bar.Left.X > preX {
 				res = append(res, bar)
-				preX = bar.End.X
+				preX = bar.Right.X
 			}
 		}
 	}
@@ -43,16 +46,15 @@ func (b *Bar) GetUpFallBars() []*Bar {
 }
 
 func (b *Bar) FallBar1StepQuietly() []*Bar {
-	g := b.Start.Game
-	y := b.Start.Y
+	g := b.Left.Game
+	y := b.Left.Y
 	if y >= len(g.grid)-1 {
 		return nil
 	}
 	row := g.grid[y]
 	downRow := g.grid[y+1]
-	var res []*Bar
-	preX := 0
-	for x := b.Start.X; x <= b.End.X; x++ {
+	var splits []int
+	for x := b.Left.X; x <= b.Right.X; x++ {
 		cur, down := row[x], downRow[x]
 		switch down.Kind {
 		case Blank:
@@ -66,14 +68,29 @@ func (b *Bar) FallBar1StepQuietly() []*Bar {
 			case Ice, IceFixed:
 				cur.IceDie()
 				down.FireDie()
-				if x-1 > preX {
-					res = append(res, &Bar{downRow[preX+1], downRow[x-1]})
-					preX = x
-				}
+				splits = append(splits, x)
 			}
 		}
 	}
+	if len(splits) == 0 {
+		return []*Bar{{downRow[b.Left.X], downRow[b.Right.X]}}
+	}
+	res := make([]*Bar, 0, len(splits)+1)
+	preX := b.Left.X
+	for _, x := range splits {
+		if preX <= x-1 {
+			res = append(res, &Bar{downRow[preX], downRow[x-1]})
+		}
+		preX = x + 1
+	}
+	if splits[len(splits)-1] != b.Right.X {
+		res = append(res, &Bar{downRow[preX], downRow[b.Right.X]})
+	}
 	return res
+}
+
+func (b *Bar) IceFixed() bool {
+	return b.Left.LeftFixed || b.Right.RightFixed
 }
 
 func (s *Sprite) Bar() *Bar {
@@ -83,5 +100,5 @@ func (s *Sprite) Bar() *Bar {
 	if s.IsIce() {
 		return s.getIceBar()
 	}
-	return &Bar{Start: s, End: s}
+	return &Bar{Left: s, Right: s}
 }

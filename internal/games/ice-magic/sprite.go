@@ -303,7 +303,7 @@ func (s *Sprite) getIceBar() *Bar {
 	if !row[x2].IsIce() {
 		x2--
 	}
-	return &Bar{Start: row[x1], End: row[x2]}
+	return &Bar{Left: row[x1], Right: row[x2]}
 }
 
 func (s *Sprite) magicLeft() {
