@@ -28,7 +28,7 @@ func (g *Game) sceneView() comp.TableView {
 		}
 		trs[i] = g.App.Tr().Tds(tds...).Height("38px")
 	}
-	return g.App.TableView().BorderColor("#00ff00").Padding(0).Trs(trs...)
+	return g.App.TableView().BorderColor("white").Padding(0).Trs(trs...)
 }
 
 func (g *Game) buttonsPanel() comp.Wrapper {

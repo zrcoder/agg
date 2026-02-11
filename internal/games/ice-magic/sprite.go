@@ -142,38 +142,6 @@ func (s *Sprite) iceSlideRight() bool {
 	return false
 }
 
-func (s *Sprite) fall1step() bool {
-	if s == nil || s.Y >= len(s.Game.grid) {
-		return false
-	}
-	down := s.Down()
-	switch s.Kind {
-	case Player:
-		switch down.Kind {
-		case Blank:
-			return s.Game.swapQuietly(s, down)
-		case Fire:
-			s.PlayerDie()
-			down.FireDie()
-			return true
-		}
-	case Ice:
-		switch down.Kind {
-		case Blank:
-			return s.Game.swapQuietly(s, down)
-		case Fire:
-			s.IceDie()
-			down.FireDie()
-			return true
-		}
-	case Fire:
-		if down.Kind == Blank {
-			return s.Game.swapQuietly(s, down)
-		}
-	}
-	return false
-}
-
 func (s *Sprite) climbLeft() bool {
 	return s.climb(s.LeftUp())
 }
@@ -253,23 +221,14 @@ func (s *Sprite) IsIce() bool {
 }
 
 func (s *Sprite) IceDie() {
-	if !s.IsIce() {
-		return
-	}
 	s.Kind = Blank
 	s.UnFix()
 }
 func (s *Sprite) FireDie() {
-	if s.Kind != Fire {
-		return
-	}
 	s.Game.fires--
 	s.Kind = Blank
 }
 func (s *Sprite) PlayerDie() {
-	if s.Kind != Player {
-		return
-	}
 	s.Game.failed = true
 	s.Kind = Blank
 }

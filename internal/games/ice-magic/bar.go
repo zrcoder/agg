@@ -53,13 +53,11 @@ func (b *Bar) FallBar1StepQuietly() []*Bar {
 	}
 	row := g.grid[y]
 	downRow := g.grid[y+1]
-	var splits []int
+	var res []*Bar
+	preX := b.Left.X
 	for x := b.Left.X; x <= b.Right.X; x++ {
 		cur, down := row[x], downRow[x]
-		switch down.Kind {
-		case Blank:
-			g.swapQuietly(cur, down)
-		case Fire:
+		if down.Kind == Fire {
 			switch cur.Kind {
 			case Player:
 				cur.PlayerDie()
@@ -68,23 +66,18 @@ func (b *Bar) FallBar1StepQuietly() []*Bar {
 			case Ice, IceFixed:
 				cur.IceDie()
 				down.FireDie()
-				splits = append(splits, x)
+				if preX < x {
+					res = append(res, &Bar{row[preX], row[x-1]})
+				}
+				preX = x + 1
 			}
 		}
 	}
-	if len(splits) == 0 {
-		return []*Bar{{downRow[b.Left.X], downRow[b.Right.X]}}
+	if preX <= b.Right.X {
+		res = append(res, &Bar{row[preX], row[b.Right.X]})
 	}
-	res := make([]*Bar, 0, len(splits)+1)
-	preX := b.Left.X
-	for _, x := range splits {
-		if preX <= x-1 {
-			res = append(res, &Bar{downRow[preX], downRow[x-1]})
-		}
-		preX = x + 1
-	}
-	if splits[len(splits)-1] != b.Right.X {
-		res = append(res, &Bar{downRow[preX], downRow[b.Right.X]})
+	for x := b.Left.X; x <= b.Right.X; x++ {
+		g.swapQuietly(row[x], downRow[x])
 	}
 	return res
 }
