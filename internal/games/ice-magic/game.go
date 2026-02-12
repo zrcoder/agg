@@ -25,22 +25,22 @@ func New(app *amisgo.App) *Game {
 
 	base := pkg.New(
 		app,
-		pkg.WithChapters(g.chapters, g.Reset),
-		pkg.WithScene(sceneName, g.Main),
+		pkg.WithChapters(g.chapters, g.reset),
+		pkg.WithScene(sceneName, g.mainView),
 	)
 	g.Base = base
-	g.Reset()
+	g.reset()
 	return g
 }
 
-func (g *Game) Reset() {
+func (g *Game) reset() {
 	chapter, level := g.Base.ChapterIndex(), g.Base.LevelIndex()
 	g.fires = 0
 	g.failed = false
 	g.parseGrid(chapter, level)
 }
 
-func (g *Game) Done() bool {
+func (g *Game) done() bool {
 	return g.fires == 0
 }
 
@@ -99,14 +99,6 @@ func (g *Game) playerMoveRight() bool {
 	return false
 }
 
-func (g *Game) checkFall(s *Sprite) {
-	if s == nil || s.Kind == Blank || s.Kind == Wall {
-		return
-	}
-	bar := s.Bar()
-	g.FallBars(bar)
-}
-
 func (g *Game) swap(src, dst *Sprite, duration time.Duration) bool {
 	if !g.swapQuietly(src, dst) {
 		return false
@@ -125,28 +117,4 @@ func (g *Game) swapQuietly(src, dst *Sprite) bool {
 	src.X, dst.X = dst.X, src.X
 	src.Y, dst.Y = dst.Y, src.Y
 	return true
-}
-
-func (g *Game) FallBars(bars ...*Bar) bool {
-	if len(bars) == 0 {
-		return false
-	}
-	var upBars, newBars []*Bar
-	res := false
-	for _, b := range bars {
-		if !b.CanFall() {
-			continue
-		}
-		res = true
-		upBars = append(upBars, b.GetUpFallBars()...)
-		newBars = append(newBars, b.FallBar1StepQuietly()...)
-	}
-	if !res {
-		return res
-	}
-	time.Sleep(stepTime)
-	g.UpdateUI()
-	g.FallBars(newBars...)
-	g.FallBars(upBars...)
-	return res
 }

@@ -16,15 +16,6 @@ type Level struct {
 	HideMagicButton bool
 }
 
-func (g *Game) CurrentChapter() pkg.Chapter {
-	return g.chapters[g.Base.ChapterIndex()]
-}
-
-func (g *Game) CurrentLevel() *Level {
-	chapter := g.chapters[g.Base.ChapterIndex()]
-	return chapter.Children[g.Base.LevelIndex()].Data.(*Level)
-}
-
 func (g *Game) initLevels() {
 	g.chapters = []pkg.Chapter{
 		{

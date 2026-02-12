@@ -1,15 +1,17 @@
 package icemagic
 
+import "time"
+
 type Bar struct {
 	Left, Right *Sprite
 }
 
-func (b *Bar) CanFall() bool {
+func (b *Bar) canFall() bool {
 	g := b.Left.Game
 	if b.Left.Y >= len(g.grid)-1 {
 		return false
 	}
-	if b.IceFixed() {
+	if b.iceFixed() {
 		return false
 	}
 	down := g.grid[b.Left.Y+1]
@@ -23,7 +25,7 @@ func (b *Bar) CanFall() bool {
 	return true
 }
 
-func (b *Bar) GetUpFallBars() []*Bar {
+func (b *Bar) getUpFallBars() []*Bar {
 	if b.Left.Y == 0 {
 		return nil
 	}
@@ -35,7 +37,7 @@ func (b *Bar) GetUpFallBars() []*Bar {
 		switch up.Kind {
 		case Wall, Blank:
 		default:
-			bar := up.Bar()
+			bar := up.bar()
 			if bar.Left.X > preX {
 				res = append(res, bar)
 				preX = bar.Right.X
@@ -45,7 +47,7 @@ func (b *Bar) GetUpFallBars() []*Bar {
 	return res
 }
 
-func (b *Bar) FallBar1StepQuietly() []*Bar {
+func (b *Bar) fallBar1StepQuietly() []*Bar {
 	g := b.Left.Game
 	y := b.Left.Y
 	if y >= len(g.grid)-1 {
@@ -82,11 +84,42 @@ func (b *Bar) FallBar1StepQuietly() []*Bar {
 	return res
 }
 
-func (b *Bar) IceFixed() bool {
+func (b *Bar) iceFixed() bool {
 	return b.Left.LeftFixed || b.Right.RightFixed
 }
 
-func (s *Sprite) Bar() *Bar {
+func (g *Game) checkFall(s *Sprite) {
+	if s == nil || s.Kind == Blank || s.Kind == Wall {
+		return
+	}
+	g.fallBars(s.bar())
+}
+
+func (g *Game) fallBars(bars ...*Bar) bool {
+	if len(bars) == 0 {
+		return false
+	}
+	var upBars, newBars []*Bar
+	res := false
+	for _, b := range bars {
+		if !b.canFall() {
+			continue
+		}
+		res = true
+		upBars = append(upBars, b.getUpFallBars()...)
+		newBars = append(newBars, b.fallBar1StepQuietly()...)
+	}
+	if !res {
+		return res
+	}
+	time.Sleep(stepTime)
+	g.UpdateUI()
+	g.fallBars(newBars...)
+	g.fallBars(upBars...)
+	return res
+}
+
+func (s *Sprite) bar() *Bar {
 	if s == nil {
 		return nil
 	}
@@ -94,4 +127,29 @@ func (s *Sprite) Bar() *Bar {
 		return s.getIceBar()
 	}
 	return &Bar{Left: s, Right: s}
+}
+
+func (s *Sprite) getIceBar() *Bar {
+	if s == nil || !s.IsIce() {
+		return nil
+	}
+	x1, x2 := s.X, s.X
+	row := s.Game.grid[s.Y]
+	for x1 >= 0 && row[x1].IsIce() && row[x1].LeftFixed {
+		x1--
+	}
+	if !row[x1].IsIce() {
+		x1++
+	}
+	for x2 < len(row) && row[x2].IsIce() && row[x2].RightFixed {
+		x2++
+	}
+	if !row[x2].IsIce() {
+		x2--
+	}
+	return &Bar{Left: row[x1], Right: row[x2]}
+}
+
+func (s *Sprite) fall() bool {
+	return s.Game.fallBars(&Bar{s, s})
 }

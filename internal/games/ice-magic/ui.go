@@ -5,7 +5,7 @@ import (
 	"github.com/zrcoder/amisgo/schema"
 )
 
-func (g *Game) View() any {
+func (g *Game) view() any {
 	if g.failed {
 		return g.App.Tpl().Tpl("Failed!").ClassName("text-2xl font-bold text-red-500 ")
 	}
@@ -70,11 +70,11 @@ func (g *Game) buttonForm(key, label string, action func() error) comp.Form {
 	})
 }
 
-func (g *Game) Main() any {
+func (g *Game) mainView() any {
 	return g.Base.Main(
-		g.Done(),
+		g.done(),
 		"",
 		"",
-		g.View(),
+		g.view(),
 	)
 }

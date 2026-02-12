@@ -244,27 +244,6 @@ func (s *Sprite) UnFix() {
 	}
 }
 
-func (s *Sprite) getIceBar() *Bar {
-	if s == nil || !s.IsIce() {
-		return nil
-	}
-	x1, x2 := s.X, s.X
-	row := s.Game.grid[s.Y]
-	for x1 >= 0 && row[x1].IsIce() && row[x1].LeftFixed {
-		x1--
-	}
-	if !row[x1].IsIce() {
-		x1++
-	}
-	for x2 < len(row) && row[x2].IsIce() && row[x2].RightFixed {
-		x2++
-	}
-	if !row[x2].IsIce() {
-		x2--
-	}
-	return &Bar{Left: row[x1], Right: row[x2]}
-}
-
 func (s *Sprite) magicLeft() {
 	if s.Kind != Player {
 		return
@@ -305,8 +284,4 @@ func (s *Sprite) magic(dst *Sprite) {
 		s.Game.checkFall(left)
 		s.Game.checkFall(right)
 	}
-}
-
-func (s *Sprite) fall() bool {
-	return s.Game.FallBars(&Bar{s, s})
 }
