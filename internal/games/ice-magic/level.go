@@ -35,6 +35,11 @@ func (g *Game) initLevels() {
 				{}, {}, {}, {}, {}, {}, {}, {}, {},
 			},
 		},
+		{
+			Children: []pkg.Level{
+				{}, {}, {}, {}, {}, {}, {},
+			},
+		},
 	}
 	for i := range g.chapters {
 		g.chapters[i].Label = fmt.Sprintf("Chapter %d", i+1)
