@@ -143,7 +143,7 @@ func (p *Pile) Pop() *Disk {
 func (p *Pile) renewDisks() {
 	p.Disks = p.Disks[:0]
 	n := p.CurrentLevel().Disks
-	for i := 0; i < n; i++ {
+	for i := range n {
 		p.Disks = append(p.Disks, NewDisk(p, n-1-i))
 	}
 }

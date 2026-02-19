@@ -81,7 +81,6 @@ func (g *Game) shape(shape, color string) comp.Shape {
 func (g *Game) makeBottleForms() {
 	g.bottleForms = make([]comp.Form, len(g.colors)+EmptyBottles)
 	for i := range g.bottleForms {
-		i := i
 		g.bottleForms[i] = g.Form().WrapWithPanel(false).Submit(
 			func(s schema.Schema) error {
 				g.SelectBottle(i)

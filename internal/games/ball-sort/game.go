@@ -56,8 +56,8 @@ func (g *Game) Reset() {
 	})
 	n := g.currentBallTubes()
 	balls := make([]*Ball, 0, n*BottleBallCount)
-	for i := 0; i < n; i++ {
-		for j := 0; j < BottleBallCount; j++ {
+	for i := range n {
+		for range BottleBallCount {
 			balls = append(balls, &Ball{Type: i})
 		}
 	}
@@ -66,7 +66,7 @@ func (g *Game) Reset() {
 	})
 	g.Bottles = make([]*Bottle, 0, n+EmptyBottles)
 	i := 0
-	for j := 0; j < n; j++ {
+	for range n {
 		bottle := &Bottle{Game: g}
 		bottle.Balls = balls[i : i+BottleBallCount]
 		for _, ball := range bottle.Balls {
@@ -75,7 +75,7 @@ func (g *Game) Reset() {
 		i += BottleBallCount
 		g.Bottles = append(g.Bottles, bottle)
 	}
-	for j := 0; j < EmptyBottles; j++ {
+	for range EmptyBottles {
 		bottle := &Bottle{
 			Game:  g,
 			Balls: make([]*Ball, 0, BottleBallCount),

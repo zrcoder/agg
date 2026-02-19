@@ -99,13 +99,13 @@ func (p *Pile) UI() comp.TableView {
 func (d *Disk) UI() comp.Tr {
 	tds := make([]comp.Td, 0, 2*maxDiskCount)
 	blanks := maxDiskCount - d.ID - 1
-	for i := 0; i < blanks; i++ {
+	for range blanks {
 		tds = append(tds, d.Td().Style(d.tdBorderNone()))
 	}
-	for i := 0; i < 2*(d.ID+1); i++ {
+	for range 2 * (d.ID + 1) {
 		tds = append(tds, d.Td().Background(d.colors[d.ID]).Style(d.tdBorderNone()))
 	}
-	for i := 0; i < blanks; i++ {
+	for range blanks {
 		tds = append(tds, d.Td().Style(d.tdBorderNone()))
 	}
 	return d.Tr().Tds(tds...)
