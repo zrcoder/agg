@@ -1,9 +1,9 @@
 gen: 
-	@ixgo export -outdir ./internal/exported ./pkg/export/hanoi
+	@go generate
 
 clean: 
 	@rm -rf internal/exported
 
 
 run:
-	@go run -ldflags="-checklinkname=0" ./cmd
+	@go run ./cmd
