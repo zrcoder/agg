@@ -1,10 +1,14 @@
 # agg
 Simple games for STEM education, based on [amisgo](https://github.com/zrcoder/amisgo).
 
-## ball-sort
+## Ball sort
 
 ![ball-sort](ball-sort.png)
 
-## hanoi
+## Hanoi
 
 ![hanoi](hanoi.png)
+
+## Ice magic
+
+![ice-magic](ice-magic.png)
