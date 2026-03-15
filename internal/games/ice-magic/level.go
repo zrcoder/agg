@@ -37,7 +37,17 @@ func (g *Game) initLevels() {
 		},
 		{
 			Children: []pkg.Level{
-				{}, {}, {}, {}, {}, {}, {}, {},
+				{}, {}, {}, {}, {}, {}, {}, {}, {},
+			},
+		},
+		{
+			Children: []pkg.Level{
+				{}, {}, {}, {}, {}, {}, {}, {}, {},
+			},
+		},
+		{
+			Children: []pkg.Level{
+				{}, {},
 			},
 		},
 	}
