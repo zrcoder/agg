@@ -36,10 +36,10 @@ var noBorderTdStyle = map[string]int{
 }
 
 func (s *Sprite) View() comp.Td {
-	td := s.Td().Colspan(1).Width("40px").Align("center")
+	td := s.Td().Width("40px").Align("center")
 	switch s.Kind {
 	case Fire:
-		td.Body(s.Tpl("🔥")).Style(noBorderTdStyle)
+		td.Body(s.Image().Src("/static/fire.gif").ImageMode("original").InnerClassName("border-none")).Style(noBorderTdStyle)
 	case Player:
 		td.Body(s.Tpl("🐙")).Style(noBorderTdStyle)
 	case Wall:
