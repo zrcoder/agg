@@ -1,7 +1,8 @@
 package pkg
 
 import (
-	"log"
+	"context"
+	"log/slog"
 	"math/rand/v2"
 	"net/http"
 	"time"
@@ -33,8 +34,7 @@ type Base struct {
 }
 
 func New(app *amisgo.App, opts ...Option) *Base {
-	seed1 := uint64(time.Now().UnixNano())
-	seed2 := uint64(time.Now().UnixNano())
+	seed1, seed2 := uint64(time.Now().UnixNano()), uint64(time.Now().UnixNano())
 	b := &Base{
 		App:         app,
 		rd:          rand.New(rand.NewPCG(seed1, seed2)),
@@ -50,17 +50,31 @@ func New(app *amisgo.App, opts ...Option) *Base {
 }
 
 func (b *Base) wsHandler(w http.ResponseWriter, r *http.Request) {
-	var err error
-	b.wsConn, err = b.wsUpgrader.Upgrade(w, r, nil)
+	conn, err := b.wsUpgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Panic(err)
+		slog.Error("websocket upgrade failed", "error", err)
 		return
 	}
-	defer b.wsConn.Close()
+	defer conn.Close()
+	b.wsConn = conn
 
 	b.UpdateUI()
 
 	select {}
+}
+
+func (b *Base) wsHandlerWithContext(ctx context.Context) {
+	conn, err := b.wsUpgrader.Upgrade(nil, nil, nil)
+	if err != nil {
+		slog.Error("websocket upgrade failed", "error", err)
+		return
+	}
+	defer conn.Close()
+	b.wsConn = conn
+
+	b.UpdateUI()
+
+	<-ctx.Done()
 }
 
 func (b *Base) UpdateUI() error {
@@ -103,7 +117,9 @@ func (b *Base) levelSelectForm() comp.Form {
 		options = b.levelOptions
 		value = b.levels[b.LevelIndex()].Value
 		form.Submit(func(s schema.Schema) error {
-			b.levelIndex = int(s.Get(levelSelectID).(float64))
+			if v, ok := s.Get(levelSelectID).(float64); ok {
+				b.levelIndex = int(v)
+			}
 			b.reset()
 			return b.UpdateUI()
 		})

@@ -3,6 +3,7 @@ package icemagic
 import (
 	"bytes"
 	"fmt"
+	"log/slog"
 
 	"github.com/zrcoder/agg/internal/games/ice-magic/levels"
 	"github.com/zrcoder/agg/pkg"
@@ -20,9 +21,8 @@ func (g *Game) initLevels() {
 	g.chapters = []pkg.Chapter{
 		{
 			Children: []pkg.Level{
-				{
-					Data: &Level{HideMagicButton: true},
-				}, {}, {}, {}, {}, {}, {}, {}, {},
+				{Data: &Level{HideMagicButton: true}},
+				{}, {}, {}, {}, {}, {}, {}, {},
 			},
 		},
 		{
@@ -62,7 +62,8 @@ func (g *Game) initLevels() {
 func (g *Game) parseGrid(chapter, level int) {
 	data, err := levels.FS.ReadFile(fmt.Sprintf("%d/%d.txt", chapter+1, level+1))
 	if err != nil {
-		panic(err)
+		slog.Error("failed to read level file", "error", err)
+		return
 	}
 
 	lines := bytes.Split(data, []byte{'\n'})

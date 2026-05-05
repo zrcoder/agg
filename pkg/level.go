@@ -13,7 +13,7 @@ type Chapter struct {
 type Level struct {
 	Label string `json:"label"`
 	Data  any    `json:"-"`
-	Value any    `json:"value"` // Value is a inner field
+	Value any    `json:"value"`
 }
 
 type LevelMeta struct {

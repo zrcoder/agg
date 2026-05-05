@@ -31,7 +31,7 @@ C
 `
 
 	hardLevelInfo = `Solving the Tower of Hanoi with Recursion
-Challenge: 
+Challenge:
 
 Implement the core logic of moving the largest disk
 Key insights:
@@ -48,19 +48,13 @@ Key insights:
     // Step 1: Move n-1 disks from source to auxiliary pile
     // This creates space to move the largest disk
     solve disks-1, a, c, b
-    
+
     // Step 2: Move the largest disk from source to destination
     // TODO: Implement disk movement logic
-    
-    
-	
-    // Step 3: Move n-1 disks from auxiliary pile to destination
-    // Completes the recursive solution
-    solve disks-1, b, a, c
+
+
 }
 
-// Demonstrate solving Tower of Hanoi with 5 disks
-solve 5, a, b, c
 `
 
 	expertLevelInfo = "Solve it with recursion"

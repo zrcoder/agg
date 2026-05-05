@@ -1,12 +1,11 @@
 package internal
 
 import (
-	"fmt"
+	"log/slog"
 	"net/http"
 
 	ballsort "github.com/zrcoder/agg/internal/games/ball-sort"
 	"github.com/zrcoder/agg/internal/games/hanoi"
-
 	icemagic "github.com/zrcoder/agg/internal/games/ice-magic"
 	"github.com/zrcoder/agg/internal/static"
 
@@ -45,8 +44,10 @@ func Run(hanoiCodeAction func(string, func() error) error) {
 	app.StaticFS("/static", http.FS(static.FS))
 	app.Mount("/", index())
 
-	fmt.Println("Amisgo Games started at http://localhost:3000")
-	panic(app.Run(":3000"))
+	slog.Info("Amisgo Games started", "address", "http://localhost:3000")
+	if err := app.Run(":3000"); err != nil {
+		slog.Error("server error", "error", err)
+	}
 }
 
 func index() comp.Page {
