@@ -67,26 +67,6 @@ func (s *Sprite) borderStyle() map[string]int {
 	return style
 }
 
-func (s *Sprite) moveLeft() bool {
-	switch s.Kind {
-	case Player:
-		return s.playerMoveLeft()
-	case Ice:
-		return s.iceSlideLeft()
-	}
-	return false
-}
-
-func (s *Sprite) moveRight() bool {
-	switch s.Kind {
-	case Player:
-		return s.playerMoveRight()
-	case Ice:
-		return s.iceSlideRight()
-	}
-	return false
-}
-
 func (s *Sprite) iceSlideLeft() bool {
 	left := s.Left()
 	if left == nil {

@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"context"
 	"log/slog"
 	"math/rand/v2"
 	"net/http"
@@ -61,20 +60,6 @@ func (b *Base) wsHandler(w http.ResponseWriter, r *http.Request) {
 	b.UpdateUI()
 
 	select {}
-}
-
-func (b *Base) wsHandlerWithContext(ctx context.Context) {
-	conn, err := b.wsUpgrader.Upgrade(nil, nil, nil)
-	if err != nil {
-		slog.Error("websocket upgrade failed", "error", err)
-		return
-	}
-	defer conn.Close()
-	b.wsConn = conn
-
-	b.UpdateUI()
-
-	<-ctx.Done()
 }
 
 func (b *Base) UpdateUI() error {

@@ -35,12 +35,12 @@ func (g *Game) buttonsPanel() comp.Wrapper {
 	return g.App.Wrapper().Body(
 		g.App.Flex().Items(
 			g.buttonForm("J", "←", func() error {
-				g.player.moveLeft()
+				g.playerMoveLeft()
 				return nil
 			}),
 			g.App.Wrapper(),
 			g.buttonForm("L", "→", func() error {
-				g.player.moveRight()
+				g.playerMoveRight()
 				return nil
 			}),
 		),
